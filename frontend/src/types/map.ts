@@ -23,6 +23,8 @@ export interface BuildingTemplate {
   description?: string;
   costEstimate?: number;
   params?: Record<string, number | string>;
+  /** Sketchfab model UID for 3D preview in the renderer */
+  sketchfabUid?: string;
 }
 
 /* -- Building definition from JSON (PRD format) -- */
@@ -39,6 +41,8 @@ export interface BuildingDefinition {
   };
   params?: Record<string, number | string>;
   thumbnail?: string;
+  /** Sketchfab model UID for 3D preview in the renderer */
+  sketchfabUid?: string;
 }
 
 /* -- Placed building (instance on map) -- */

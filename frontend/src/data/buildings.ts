@@ -67,6 +67,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     color: TYPE_COLORS.civic,
     description: 'Neoclassical civic landmark and municipal government seat in Market Square.',
     costEstimate: 0,
+    sketchfabUid: '5303dd0b15304264ac649ba248a1871c', // Post Office Bugojno
     footprintMeters: [
       [-27.5, -15],
       [27.5, -15],
@@ -83,6 +84,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     color: TYPE_COLORS.educational,
     description: "Queen's University assembly hall and campus landmark.",
     costEstimate: 0,
+    sketchfabUid: 'c6b0308c2ebb4842ae49aff70ce14ad0', // Modern Office Building
     footprintMeters: [
       [-22.5, -17.5],
       [22.5, -17.5],
@@ -99,6 +101,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     color: TYPE_COLORS.commercial,
     description: 'Arena / entertainment venue, ~120 m x 90 m.',
     costEstimate: 46000000,
+    sketchfabUid: '770acf6b0da74af397f748d95141f8be', // Industrial Building
     footprintMeters: [
       [-60, -45],
       [60, -45],
@@ -115,6 +118,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     color: TYPE_COLORS.residential,
     description: 'High-rise residential condo tower with lake views.',
     costEstimate: 35000000,
+    sketchfabUid: '147b38a4cc1149f3af52734e0d581866', // High-Rise Office Building Raduga
     footprintMeters: [
       [-15, -10],
       [15, -10],
@@ -131,6 +135,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     color: TYPE_COLORS.mixed_use,
     description: 'Mixed-use street-front commercial with residential above.',
     costEstimate: 5000000,
+    sketchfabUid: '168f378f03f24f1280e76c824b3cf7fc', // Modern Low-Rise Condo 1
     footprintMeters: [
       [-30, -7.5],
       [30, -7.5],
@@ -147,6 +152,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     color: TYPE_COLORS.civic,
     description: 'L-shaped heritage courthouse, a Frontenac County landmark.',
     costEstimate: 0,
+    sketchfabUid: '154fb8d55bc144e78f9c19e56637b6a4', // Modular Industrial Building
     footprintMeters: [
       [-25, -20],
       [25, -20],
@@ -165,6 +171,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     color: TYPE_COLORS.residential,
     description: 'Mid-to-high rise mixed-use building with ground-floor retail.',
     costEstimate: 42000000,
+    sketchfabUid: '9e891744efb04f359c88aaed25c0b53f', // Low-Rise Modern Condo 3
     footprintMeters: [
       [-20, -12.5],
       [20, -12.5],
@@ -181,6 +188,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     color: TYPE_COLORS.residential,
     description: 'Midrise residential building near key amenities and transit.',
     costEstimate: 21000000,
+    sketchfabUid: '2aaa4c5fb7c24e829973ea4576db41ba', // Low-Rise Modern Condo 2
     footprintMeters: [
       [-20, -12.5],
       [20, -12.5],
@@ -197,6 +205,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     color: TYPE_COLORS.commercial,
     description: 'Retail/services commercial development near downtown.',
     costEstimate: 8000000,
+    sketchfabUid: '1ae7f2998d6d400a90b3f7c462085093', // Kodiak Condos
     footprintMeters: [
       [-20, -10],
       [20, -10],

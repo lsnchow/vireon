@@ -21,7 +21,17 @@ import {
 } from '@/lib/impact-engine';
 import type { FeatureCollection } from '@/lib/geo-analysis';
 
-export default function CivicLensApp() {
+interface CivicLensAppProps {
+  /** Building ID selected in the renderer (passed via URL) */
+  initialBuildingId?: string;
+  /** Optional height override from the renderer */
+  heightOverride?: number;
+}
+
+export default function CivicLensApp({
+  initialBuildingId,
+  heightOverride,
+}: CivicLensAppProps = {}) {
   const {
     state,
     selectedBuilding,
@@ -37,6 +47,38 @@ export default function CivicLensApp() {
     setMitigation,
     applyMitigation,
   } = useCivicLens();
+
+  /* ── Whether user arrived from the renderer with a pre-selected building ── */
+  const hasInitialBuilding = Boolean(initialBuildingId);
+  const [showLibrary, setShowLibrary] = useState(!hasInitialBuilding);
+  const initialPlacedRef = useRef(false);
+
+  /* ── Auto-place the initial building from renderer ── */
+  useEffect(() => {
+    if (!initialBuildingId || initialPlacedRef.current) return;
+
+    const template = getBuildingById(initialBuildingId);
+    if (!template) return;
+
+    initialPlacedRef.current = true;
+    addBuilding(initialBuildingId, KINGSTON_CENTER);
+  }, [initialBuildingId, addBuilding]);
+
+  /* ── Apply height override once the building is placed ── */
+  const heightAppliedRef = useRef(false);
+  useEffect(() => {
+    if (!initialBuildingId || !heightOverride || heightAppliedRef.current) return;
+    const placed = state.placedBuildings.find(
+      (b) => b.templateId === initialBuildingId
+    );
+    if (placed) {
+      heightAppliedRef.current = true;
+      const template = getBuildingById(initialBuildingId);
+      if (template && heightOverride !== template.defaultHeight) {
+        updateBuilding(placed.id, { height: heightOverride });
+      }
+    }
+  }, [initialBuildingId, heightOverride, state.placedBuildings, updateBuilding]);
 
   /* ── GeoJSON layers (shared between MapView and impact engine) ── */
   const [layers, setLayers] = useState<CityLayers>({
@@ -211,13 +253,25 @@ export default function CivicLensApp() {
         cityLayers={layers}
       />
 
-      {/* Building Library sidebar */}
-      <BuildingLibrary
-        isOpen={state.sidebarOpen}
-        onToggle={toggleSidebar}
-        onAddBuilding={handleAddBuilding}
-        placedCount={state.placedBuildings.length}
-      />
+      {/* Building Library sidebar (hidden when renderer provided a building; toggle to show) */}
+      {showLibrary && (
+        <BuildingLibrary
+          isOpen={state.sidebarOpen}
+          onToggle={toggleSidebar}
+          onAddBuilding={handleAddBuilding}
+          placedCount={state.placedBuildings.length}
+        />
+      )}
+
+      {/* Toggle library button when coming from renderer */}
+      {hasInitialBuilding && !showLibrary && (
+        <button
+          onClick={() => { setShowLibrary(true); toggleSidebar(); }}
+          className="fixed top-20 left-3 z-40 rounded-lg bg-[#12121a]/90 border border-[#2a2a3e] px-3 py-2 text-xs text-[#9898b0] hover:text-[#e8e8f0] hover:border-[#6c63ff]/40 backdrop-blur-sm transition-all"
+        >
+          Show Library
+        </button>
+      )}
 
       {/* Scenario & overlay controls (top-right) */}
       <ScenarioBar
@@ -258,6 +312,19 @@ export default function CivicLensApp() {
           impact={hoverInfo.impact}
           featureName={hoverInfo.featureName}
         />
+      )}
+
+      {/* Back to Catalog link */}
+      {hasInitialBuilding && (
+        <a
+          href="/renderer"
+          className="fixed top-3 left-3 z-40 flex items-center gap-1.5 rounded-lg bg-[#12121a]/90 border border-[#2a2a3e] px-3 py-2 text-xs font-mono text-[#9898b0] hover:text-[#e8e8f0] hover:border-[#6c63ff]/40 backdrop-blur-sm transition-all"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Catalog
+        </a>
       )}
 
       {/* Branding watermark */}

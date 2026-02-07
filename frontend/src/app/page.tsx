@@ -364,7 +364,7 @@ export default function Home() {
                   {item}
                 </a>
               ))}
-              <Link href="/simulate" className="wireframe-card !px-4 !py-2 font-mono text-xs text-white hover:bg-white/[0.08] transition-colors uppercase tracking-wider">
+              <Link href="/renderer" className="wireframe-card !px-4 !py-2 font-mono text-xs text-white hover:bg-white/[0.08] transition-colors uppercase tracking-wider">
                 Launch CivicLens
               </Link>
             </div>
@@ -393,7 +393,7 @@ export default function Home() {
 
             {/* Center button — overlays the 3D scene */}
             <div className={`flex justify-center my-16 md:my-24 transition-all duration-700 delay-500 ${mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
-              <Link href="/simulate" className="wireframe-card !px-10 !py-4 font-mono text-sm text-white/80 hover:text-white hover:bg-white/[0.06] transition-all uppercase tracking-[0.3em]">
+              <Link href="/renderer" className="wireframe-card !px-10 !py-4 font-mono text-sm text-white/80 hover:text-white hover:bg-white/[0.06] transition-all uppercase tracking-[0.3em]">
                 Launch CivicLens
               </Link>
             </div>

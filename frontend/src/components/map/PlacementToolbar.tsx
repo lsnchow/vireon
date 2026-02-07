@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   RotateCw,
   ArrowUpDown,
@@ -10,6 +11,7 @@ import {
   Plus,
   Move,
   Shield,
+  ArrowLeft,
 } from 'lucide-react';
 import { getBuildingById, TYPE_BADGES } from '@/data/buildings';
 import type { PlacedBuilding } from '@/types/map';
@@ -156,6 +158,13 @@ export default function PlacementToolbar({
               </span>
             </div>
           )}
+          <Link
+            href="/renderer"
+            className="rounded-md p-2 text-[#9898b0] transition-colors hover:bg-[#1a1a2e] hover:text-[#e8e8f0]"
+            title="Back to Catalog"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
           <button
             onClick={onDelete}
             className="rounded-md p-2 text-[#ff4757] transition-colors hover:bg-[#ff4757]/10"
