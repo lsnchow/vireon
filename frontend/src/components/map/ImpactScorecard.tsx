@@ -42,24 +42,24 @@ function getGradeInfo(score: number): { grade: string; color: string; strokeColo
 
 /* ── Icons for criteria ── */
 const CRITERION_ICONS: Record<string, React.ReactNode> = {
-  c1_env: <Leaf className="h-3.5 w-3.5" />,
-  c2_infra: <Zap className="h-3.5 w-3.5" />,
-  c3_live: <Home className="h-3.5 w-3.5" />,
-  c4_econ: <TrendingUp className="h-3.5 w-3.5" />,
-  c5_accept: <Users className="h-3.5 w-3.5" />,
+  c1_env: <Leaf className="h-4 w-4" />,
+  c2_infra: <Zap className="h-4 w-4" />,
+  c3_live: <Home className="h-4 w-4" />,
+  c4_econ: <TrendingUp className="h-4 w-4" />,
+  c5_accept: <Users className="h-4 w-4" />,
 };
 
 /* ── Circular Progress Gauge ── */
 function CircularGauge({ score }: { score: number }) {
-  const radius = 40;
-  const circumference = 2 * Math.PI * radius; // ~251.3
+  const radius = 42;
+  const circumference = 2 * Math.PI * radius;
   const dashLength = (score / 100) * circumference;
   const { grade, color, strokeColor } = getGradeInfo(score);
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-5">
       <div className="relative">
-        <svg width="88" height="88" viewBox="0 0 100 100">
+        <svg width="110" height="110" viewBox="0 0 100 100">
           {/* Background ring */}
           <circle
             cx="50"
@@ -88,7 +88,7 @@ function CircularGauge({ score }: { score: number }) {
             y="54"
             textAnchor="middle"
             fill="white"
-            fontSize="22"
+            fontSize="28"
             fontWeight="bold"
             fontFamily="monospace"
           >
@@ -98,11 +98,14 @@ function CircularGauge({ score }: { score: number }) {
       </div>
       <div className="flex flex-col">
         <div className="flex items-baseline gap-1">
-          <span className={`text-2xl font-bold font-mono ${color}`}>{score}</span>
-          <span className="text-[10px] text-white/20 font-mono">/100</span>
+          <span className={`text-3xl font-bold font-mono ${color}`}>{score}</span>
+          <span className="text-xs text-white/30 font-mono">/100</span>
         </div>
-        <span className="text-[9px] text-white/30 mt-0.5">
-          5 categories · weighted average
+        <span className="text-[10px] text-white/40 mt-1">
+          Overall Acceptance
+        </span>
+        <span className="text-[10px] text-white/30">
+          5 criteria · weighted average
         </span>
       </div>
     </div>
@@ -127,19 +130,19 @@ function CriterionRow({
     <div className="border-b border-white/[0.04] last:border-b-0">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center gap-2 px-3 py-2.5 text-left hover:bg-white/[0.03] transition-colors"
+        className="flex w-full items-center gap-2.5 px-4 py-3 text-left hover:bg-white/[0.03] transition-colors"
       >
         <span className={scoreTextColor(criterion.score, criterion.higherIsWorse)}>
-          {CRITERION_ICONS[criterion.id] ?? <Zap className="h-3.5 w-3.5" />}
+          {CRITERION_ICONS[criterion.id] ?? <Zap className="h-4 w-4" />}
         </span>
 
-        <span className="flex-1 text-[10px] font-medium text-white truncate">
+        <span className="flex-1 text-xs font-medium text-white truncate">
           {criterion.label}
         </span>
 
         {/* Score number */}
         <span
-          className={`text-xs font-mono font-bold ${scoreTextColor(
+          className={`text-sm font-mono font-bold ${scoreTextColor(
             criterion.score,
             criterion.higherIsWorse
           )}`}
@@ -150,7 +153,7 @@ function CriterionRow({
         {/* Delta indicator */}
         {delta !== undefined && delta !== 0 && (
           <span
-            className={`flex items-center text-[10px] font-mono ${
+            className={`flex items-center text-xs font-mono ${
               (criterion.higherIsWorse ? delta < 0 : delta > 0)
                 ? 'text-emerald-400'
                 : 'text-red-400'
@@ -166,7 +169,7 @@ function CriterionRow({
         )}
 
         {/* Score bar */}
-        <div className="w-14 h-1 rounded-full bg-white/[0.06] overflow-hidden">
+        <div className="w-20 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
           <div
             className={`h-full rounded-full transition-all ${scoreColor(
               criterion.score,
@@ -177,27 +180,27 @@ function CriterionRow({
         </div>
 
         {expanded ? (
-          <ChevronUp className="h-3 w-3 text-white/20" />
+          <ChevronUp className="h-3.5 w-3.5 text-white/30" />
         ) : (
-          <ChevronDown className="h-3 w-3 text-white/20" />
+          <ChevronDown className="h-3.5 w-3.5 text-white/30" />
         )}
       </button>
 
       {/* Drivers breakdown */}
       {expanded && (
-        <div className="px-3 pb-2.5 space-y-1.5">
+        <div className="px-4 pb-3 space-y-2">
           {criterion.drivers.map((d, i) => (
-            <div key={i} className="flex items-start gap-2 text-[10px]">
-              <span className="text-white/20 mt-0.5">{'>'}</span>
+            <div key={i} className="flex items-start gap-2 text-xs">
+              <span className="text-white/25 mt-0.5">{'>'}</span>
               <div className="flex-1">
                 <div className="flex items-baseline gap-1.5">
                   <span className="font-medium text-white/70">{d.name}:</span>
-                  <span className="font-mono text-white/30">
+                  <span className="font-mono text-white/40">
                     {d.value === Infinity ? '∞' : d.value}
                     {d.unit ? ` ${d.unit}` : ''}
                   </span>
                 </div>
-                <div className="text-white/25 leading-tight">{d.description}</div>
+                <div className="text-white/35 leading-snug mt-0.5">{d.description}</div>
               </div>
             </div>
           ))}
@@ -230,8 +233,8 @@ export default function ImpactScorecard({
 }: ImpactScorecardProps) {
   if (!impact) {
     return (
-      <div className="fixed right-4 top-36 z-40 w-80 rounded-xl border border-white/[0.06] bg-[rgba(6,13,24,0.9)] shadow-2xl backdrop-blur-xl font-mono">
-        <div className="px-4 py-6 text-center text-[10px] text-white/30 uppercase tracking-wider">
+      <div className="fixed right-4 top-20 z-40 w-96 rounded-xl border border-white/[0.06] bg-[rgba(6,13,24,0.9)] shadow-2xl backdrop-blur-xl font-mono">
+        <div className="px-5 py-8 text-center text-xs text-white/40 uppercase tracking-wider">
           Select or place a building to see impact scores
         </div>
       </div>
@@ -243,44 +246,46 @@ export default function ImpactScorecard({
     : {};
 
   return (
-    <div className="fixed right-4 top-36 z-40 w-80 rounded-xl border border-white/[0.06] bg-[rgba(6,13,24,0.9)] shadow-2xl backdrop-blur-xl overflow-hidden font-mono">
+    <div className="fixed right-4 top-20 z-40 w-96 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-white/[0.06] bg-[rgba(6,13,24,0.9)] shadow-2xl backdrop-blur-xl font-mono">
       {/* Header */}
-      <div className="border-b border-white/[0.04] px-4 py-3">
-        <div className="flex items-center gap-2 mb-0.5">
-          <Activity className="h-3.5 w-3.5 text-white/30" />
-          <h3 className="text-[10px] text-white/50 uppercase tracking-widest">
+      <div className="border-b border-white/[0.04] px-5 py-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Activity className="h-4 w-4 text-white/40" />
+          <h3 className="text-xs text-white/60 uppercase tracking-widest">
             Impact Scorecard
           </h3>
         </div>
-        <p className="text-xs text-white font-medium truncate">{buildingName}</p>
-        <p className="text-[9px] text-white/20 mt-0.5">
+        <p className="text-sm text-white font-medium truncate">{buildingName}</p>
+        <p className="text-[10px] text-white/30 mt-0.5">
           Deterministic analysis of placement impact
         </p>
       </div>
 
       {/* Circular gauge */}
-      <div className="px-4 py-4 border-b border-white/[0.04]">
+      <div className="px-5 py-5 border-b border-white/[0.04]">
         <CircularGauge score={impact.overallAcceptance} />
       </div>
 
       {/* Blended score (shown after simulation) */}
       {aggregateResult && (
-        <div className="px-4 py-3 border-b border-white/[0.04] bg-white/[0.015]">
+        <div className="px-5 py-4 border-b border-white/[0.04] bg-white/[0.015]">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-[8px] text-white/25 uppercase tracking-wider">Sentiment</span>
-              <div className={`text-sm font-bold ${blendedScoreColor(aggregateResult.sentiment_score)}`}>
+              <span className="text-[10px] text-white/40 uppercase tracking-wider">Sentiment</span>
+              <div className={`text-base font-bold ${blendedScoreColor(aggregateResult.sentiment_score)}`}>
                 {Math.round(aggregateResult.sentiment_score)}
+                <span className="text-xs text-white/25 font-normal ml-1">/100</span>
               </div>
             </div>
             <div className="text-right">
-              <span className="text-[8px] text-white/25 uppercase tracking-wider">Final Blended</span>
-              <div className={`text-sm font-bold ${blendedScoreColor(aggregateResult.final_score)}`}>
+              <span className="text-[10px] text-white/40 uppercase tracking-wider">Final Blended</span>
+              <div className={`text-base font-bold ${blendedScoreColor(aggregateResult.final_score)}`}>
                 {Math.round(aggregateResult.final_score)}
+                <span className="text-xs text-white/25 font-normal ml-1">/100</span>
               </div>
             </div>
           </div>
-          <p className="text-[8px] text-white/20 mt-1">
+          <p className="text-[10px] text-white/30 mt-1.5">
             70% deterministic + 30% stakeholder sentiment
           </p>
         </div>
@@ -298,25 +303,25 @@ export default function ImpactScorecard({
       </div>
 
       {/* Cost estimate */}
-      <div className="border-t border-white/[0.04] px-4 py-2 flex items-center gap-2">
-        <DollarSign className="h-3.5 w-3.5 text-white/20" />
-        <span className="text-[10px] text-white/30">Est. Cost:</span>
-        <span className="text-xs font-medium text-white">
+      <div className="border-t border-white/[0.04] px-5 py-3 flex items-center gap-2">
+        <DollarSign className="h-4 w-4 text-white/30" />
+        <span className="text-xs text-white/40">Est. Cost:</span>
+        <span className="text-sm font-medium text-white">
           ${(impact.costEstimate / 1_000_000).toFixed(1)}M
         </span>
       </div>
 
       {/* Top drivers for acceptance */}
       {impact.topDrivers.length > 0 && (
-        <div className="border-t border-white/[0.04] px-4 py-2">
-          <div className="text-[9px] font-medium text-white/30 mb-1 uppercase tracking-wider">
+        <div className="border-t border-white/[0.04] px-5 py-3">
+          <div className="text-[10px] font-medium text-white/40 mb-1.5 uppercase tracking-wider">
             Key Drivers
           </div>
           {impact.topDrivers.map((d, i) => (
-            <div key={i} className="flex items-baseline gap-1 text-[10px]">
-              <span className="text-white/15">{'>'}</span>
+            <div key={i} className="flex items-baseline gap-1.5 text-xs mb-0.5">
+              <span className="text-white/20">{'>'}</span>
               <span className="text-white/60">{d.name}</span>
-              <span className="font-mono text-white/25">
+              <span className="font-mono text-white/35">
                 {d.value === Infinity ? '∞' : d.value} {d.unit}
               </span>
             </div>
@@ -326,11 +331,11 @@ export default function ImpactScorecard({
 
       {/* Mitigation suggestion */}
       {mitigation && (
-        <div className="border-t border-white/10 bg-white/[0.03] px-4 py-2">
-          <div className="text-[9px] font-medium text-white/50 mb-1 uppercase tracking-wider">
+        <div className="border-t border-white/10 bg-white/[0.03] px-5 py-3">
+          <div className="text-[10px] font-medium text-white/50 mb-1 uppercase tracking-wider">
             Mitigation Applied
           </div>
-          <div className="text-[10px] text-white/60">
+          <div className="text-xs text-white/60">
             {mitigation.description}
           </div>
         </div>

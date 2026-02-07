@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -10,14 +9,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
-  Eye,
-  Heart,
-  Download,
   ArrowUpDown,
   Minus,
   Plus,
 } from "lucide-react";
-import { BUILDINGS, TYPE_BADGES } from "@/data/buildings";
+import { BUILDINGS } from "@/data/buildings";
 import type { BuildingTemplate } from "@/types/map";
 import { cn } from "@/lib/utils";
 
@@ -35,20 +31,6 @@ const ModelViewer = dynamic(
   }
 );
 
-/* ── Sketchfab thumbnail cache ── */
-interface ThumbnailInfo {
-  thumbnailUrl: string;
-  author: string;
-  viewCount: number;
-  likeCount: number;
-}
-
-function formatNumber(num: number): string {
-  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
-  if (num >= 1000) return (num / 1000).toFixed(1) + "K";
-  return num.toString();
-}
-
 export default function RendererPage() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -56,40 +38,6 @@ export default function RendererPage() {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const [loadingModel, setLoadingModel] = useState<string | null>(null);
   const [heightOverride, setHeightOverride] = useState<number | null>(null);
-  const [thumbnails, setThumbnails] = useState<Record<string, ThumbnailInfo>>({});
-  const [thumbnailsLoading, setThumbnailsLoading] = useState(true);
-
-  /* Load Sketchfab thumbnails for all buildings on mount */
-  useEffect(() => {
-    async function loadThumbnails() {
-      setThumbnailsLoading(true);
-      const results: Record<string, ThumbnailInfo> = {};
-
-      await Promise.all(
-        BUILDINGS.filter((b) => b.sketchfabUid).map(async (b) => {
-          try {
-            const res = await fetch(`/api/sketchfab/details?uid=${b.sketchfabUid}`);
-            if (res.ok) {
-              const data = await res.json();
-              results[b.id] = {
-                thumbnailUrl: data.thumbnailUrl || "",
-                author: data.author || "Sketchfab",
-                viewCount: data.viewCount || 0,
-                likeCount: data.likeCount || 0,
-              };
-            }
-          } catch {
-            /* ok */
-          }
-        })
-      );
-
-      setThumbnails(results);
-      setThumbnailsLoading(false);
-    }
-
-    loadThumbnails();
-  }, []);
 
   /* Load 3D model for selected building */
   const handleSelectBuilding = useCallback(
@@ -146,6 +94,8 @@ export default function RendererPage() {
             )}
           </button>
           <Link href="/" className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="Vireon" className="w-7 h-7" />
             <span className="text-sm text-white uppercase tracking-widest">Vireon</span>
           </Link>
         </div>
@@ -187,93 +137,56 @@ export default function RendererPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
-              {thumbnailsLoading && (
-                <div className="text-center py-8">
-                  <Loader2 className="w-5 h-5 mx-auto mb-3 animate-spin text-white/40" />
-                  <p className="text-[10px] text-white/30">Loading catalog...</p>
-                </div>
-              )}
+              {BUILDINGS.map((building) => {
+                const isSelected = selectedBuilding?.id === building.id;
+                const isLoading = loadingModel === building.id;
 
-              {!thumbnailsLoading &&
-                BUILDINGS.map((building) => {
-                  const thumb = thumbnails[building.id];
-                  const badge = TYPE_BADGES[building.type] ?? TYPE_BADGES.commercial;
-                  const isSelected = selectedBuilding?.id === building.id;
-                  const isLoading = loadingModel === building.id;
-
-                  return (
-                    <button
-                      key={building.id}
-                      onClick={() => handleSelectBuilding(building)}
-                      disabled={isLoading}
-                      className={cn(
-                        "flex gap-3 w-full p-3 rounded-lg border text-left transition-all",
-                        isSelected
-                          ? "border-white/20 bg-white/[0.06]"
-                          : "border-white/[0.06] bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]",
-                        isLoading && "opacity-60 cursor-wait"
-                      )}
+                return (
+                  <button
+                    key={building.id}
+                    onClick={() => handleSelectBuilding(building)}
+                    disabled={isLoading}
+                    className={cn(
+                      "flex items-center gap-3 w-full p-3 rounded-lg border text-left transition-all",
+                      isSelected
+                        ? "border-white/20 bg-white/[0.06]"
+                        : "border-white/[0.06] bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]",
+                      isLoading && "opacity-60 cursor-wait"
+                    )}
+                  >
+                    {/* Color indicator */}
+                    <div
+                      className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 border border-white/[0.06]"
+                      style={{
+                        backgroundColor: `rgba(${building.color[0]}, ${building.color[1]}, ${building.color[2]}, 0.15)`,
+                      }}
                     >
-                      {/* Thumbnail */}
-                      <div className="w-16 h-16 bg-[#060d18] rounded-md overflow-hidden flex-shrink-0 relative">
-                        {thumb?.thumbnailUrl ? (
-                          <Image
-                            src={thumb.thumbnailUrl}
-                            alt={building.name}
-                            fill
-                            className="object-cover"
-                            sizes="64px"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-white/10">
-                            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                              <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
-                            </svg>
-                          </div>
-                        )}
-                        {isLoading && (
-                          <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                            <Loader2 className="w-5 h-5 animate-spin text-white/50" />
-                          </div>
-                        )}
-                      </div>
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin text-white/50" />
+                      ) : (
+                        <svg className="w-5 h-5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
+                        </svg>
+                      )}
+                    </div>
 
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs font-medium text-white truncate">
-                          {building.name}
-                        </div>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span
-                            className={`rounded px-1.5 py-0.5 text-[9px] font-medium ${badge.bg} ${badge.text}`}
-                          >
-                            {badge.label}
-                          </span>
-                          <span className="text-[9px] text-white/30">
-                            {building.floors}F &middot; {building.defaultHeight}m
-                          </span>
-                        </div>
-                        {building.description && (
-                          <p className="text-[9px] text-white/30 mt-1 line-clamp-2 leading-tight">
-                            {building.description}
-                          </p>
-                        )}
-                        {thumb && (
-                          <div className="flex items-center gap-2 mt-1 text-[9px] text-white/20">
-                            <span className="flex items-center gap-0.5">
-                              <Eye className="w-2.5 h-2.5" />
-                              {formatNumber(thumb.viewCount)}
-                            </span>
-                            <span className="flex items-center gap-0.5">
-                              <Heart className="w-2.5 h-2.5" />
-                              {formatNumber(thumb.likeCount)}
-                            </span>
-                          </div>
-                        )}
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium text-white truncate">
+                        {building.name}
                       </div>
-                    </button>
-                  );
-                })}
+                      <span className="text-[10px] text-white/30">
+                        {building.floors}F &middot; {building.defaultHeight}m
+                      </span>
+                      {building.description && (
+                        <p className="text-[9px] text-white/25 mt-0.5 line-clamp-1 leading-tight">
+                          {building.description}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </aside>

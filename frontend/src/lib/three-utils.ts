@@ -62,6 +62,9 @@ export function initializeScene(config: SceneConfig): SceneSetup {
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(clearColor, clearAlpha);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.4;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   container.appendChild(renderer.domElement);
 
@@ -130,12 +133,23 @@ export function addOrbitControls(
  * Add basic lighting to a scene
  */
 export function addBasicLighting(scene: THREE.Scene): void {
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  // Strong ambient fill to eliminate dark spots
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
   scene.add(ambientLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  // Primary directional light
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
   directionalLight.position.set(5, 10, 7.5);
   scene.add(directionalLight);
+
+  // Secondary directional from opposite side (fill shadows)
+  const fillLight = new THREE.DirectionalLight(0xffffff, 0.6);
+  fillLight.position.set(-5, 8, -7.5);
+  scene.add(fillLight);
+
+  // Hemisphere light for sky/ground gradient fill
+  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
+  scene.add(hemiLight);
 }
 
 /**

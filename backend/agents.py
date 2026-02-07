@@ -100,6 +100,7 @@ RULES (non-negotiable):
    0-20 = strong oppose, 20-40 = oppose, 40-60 = mixed/neutral,
    60-80 = support, 80-100 = strong support.
 6. Your score MUST be consistent with your stance.
+7. NEVER use round numbers like 25, 50, 75, or any multiple of 5. Use precise values like 37, 62, 84, 53, 41, 78, etc.
 
 OUTPUT SCHEMA (follow exactly):
 {{

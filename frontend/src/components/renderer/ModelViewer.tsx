@@ -21,6 +21,25 @@ import { cn } from "@/lib/utils";
 
 type ViewMode = "wireframe" | "solid" | "xray";
 
+/* ── Theatrical loading stages ── */
+const LOADING_STAGES = [
+  { label: "Initializing renderer", threshold: 0 },
+  { label: "Fetching model geometry", threshold: 15 },
+  { label: "Decompressing mesh data", threshold: 35 },
+  { label: "Generating wireframe", threshold: 55 },
+  { label: "Vectorizing surfaces", threshold: 70 },
+  { label: "Applying materials", threshold: 85 },
+  { label: "Finalizing scene", threshold: 95 },
+];
+
+function getLoadingStage(progress: number): string {
+  let stage = LOADING_STAGES[0].label;
+  for (const s of LOADING_STAGES) {
+    if (progress >= s.threshold) stage = s.label;
+  }
+  return stage;
+}
+
 interface ModelViewerProps {
   modelUrl?: string;
   className?: string;
@@ -242,18 +261,37 @@ export default function ModelViewer({
     <div className={cn("relative w-full h-full bg-black", className)}>
       <div ref={mountRef} className="w-full h-full" />
 
-      {/* Loading overlay */}
+      {/* Theatrical loading overlay */}
       {loading && (
-        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-10">
-          <div className="w-16 h-16 border-2 border-[#6c63ff]/30 border-t-[#6c63ff] rounded-full animate-spin mb-4" />
-          <div className="text-[#6c63ff] font-mono text-sm mb-2">Loading Model...</div>
-          <div className="w-48 h-1 bg-gray-800 rounded overflow-hidden">
+        <div className="absolute inset-0 bg-[#060d18]/95 flex flex-col items-center justify-center z-10">
+          {/* Logo */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Vireon" className="w-14 h-14 mb-6 opacity-60" />
+
+          {/* Spinner */}
+          <div className="w-20 h-20 border-2 border-white/10 border-t-white/50 rounded-full animate-spin mb-6" />
+
+          {/* Stage label */}
+          <div className="font-mono text-sm text-white/60 mb-3 tracking-wider">
+            {getLoadingStage(loadProgress)}
+            <span className="animate-pulse">...</span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-80 h-1.5 bg-white/[0.06] rounded-full overflow-hidden mb-2">
             <div
-              className="h-full bg-[#6c63ff] transition-all duration-300"
+              className="h-full rounded-full bg-white/30 transition-all duration-500 ease-out"
               style={{ width: `${loadProgress}%` }}
             />
           </div>
-          <div className="text-gray-500 text-xs mt-2 font-mono">{loadProgress}%</div>
+
+          {/* Percentage */}
+          <div className="font-mono text-xs text-white/30">{loadProgress}%</div>
+
+          {/* Subtle text below */}
+          <div className="mt-6 font-mono text-[10px] text-white/15 uppercase tracking-widest">
+            Vireon · Building Renderer
+          </div>
         </div>
       )}
 

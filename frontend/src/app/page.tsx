@@ -350,12 +350,8 @@ export default function Home() {
         <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.06] bg-[rgba(6,13,24,0.7)] backdrop-blur-xl">
           <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 wireframe-card flex items-center justify-center !p-0">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
-                  <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
-                  <path d="M9 10h1M14 10h1M9 14h1M14 14h1" />
-                </svg>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="Vireon" className="w-8 h-8" />
               <span className="font-mono text-lg text-white tracking-widest uppercase">Vireon</span>
             </div>
             <div className="hidden md:flex items-center gap-8">

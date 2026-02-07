@@ -6,7 +6,7 @@ import { useCivicLens } from '@/hooks/useCivicLens';
 import { useSimulation } from '@/hooks/useSimulation';
 import MapView from '@/components/map/MapView';
 import PlacementToolbar from '@/components/map/PlacementToolbar';
-import ScenarioBar from '@/components/map/ScenarioBar';
+// import ScenarioBar from '@/components/map/ScenarioBar';
 import ImpactScorecard from '@/components/map/ImpactScorecard';
 import HoverTooltip from '@/components/map/HoverTooltip';
 import SimulatePanel from '@/components/map/SimulatePanel';
@@ -269,17 +269,17 @@ export default function CivicLensApp({
         cityLayers={layers}
       />
 
-      {/* Scenario & overlay controls (top-right) */}
-      <ScenarioBar
+      {/* Scenario & overlay controls hidden for now */}
+      {/* <ScenarioBar
         activeScenarioId={state.activeScenarioId}
         overlays={state.overlays}
         onLoadScenario={loadScenario}
         onClearAll={clearAll}
         onToggleOverlay={toggleOverlay}
-      />
+      /> */}
 
-      {/* Impact scorecard (right side, shown when a building is selected) */}
-      {selectedBuilding && (
+      {/* Impact scorecard (right side, shown after simulation completes) */}
+      {selectedBuilding && sim.phase === 'complete' && (
         <ImpactScorecard
           impact={selectedImpact}
           mitigation={state.mitigation}
@@ -347,8 +347,12 @@ export default function CivicLensApp({
       </a>
 
       {/* Branding watermark */}
-      <div className="pointer-events-none fixed bottom-3 right-3 z-30 text-[9px] font-mono font-medium text-white/20 uppercase tracking-widest">
-        Vireon · Kingston
+      <div className="pointer-events-none fixed bottom-3 right-3 z-30 flex items-center gap-2">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="" className="w-5 h-5 opacity-20" />
+        <span className="text-[9px] font-mono font-medium text-white/20 uppercase tracking-widest">
+          Vireon · Kingston
+        </span>
       </div>
     </div>
   );

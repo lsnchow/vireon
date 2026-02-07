@@ -54,7 +54,7 @@ export default function SimulatePanel({
   const canSimulate = phase === 'idle' || isComplete || isError;
 
   return (
-    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
+    <div className="fixed bottom-32 left-1/2 -translate-x-1/2 z-50">
       <div className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-[rgba(6,13,24,0.9)] shadow-2xl backdrop-blur-xl font-mono px-3 py-2.5">
         {/* Model selector */}
         <div className="relative">
@@ -62,7 +62,7 @@ export default function SimulatePanel({
             value={selectedModel}
             onChange={(e) => onModelChange(e.target.value)}
             disabled={isRunning}
-            className="appearance-none bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-1.5 pr-7 text-[10px] text-white/70 uppercase tracking-wider focus:outline-none focus:border-white/10 disabled:opacity-50 cursor-pointer"
+            className="appearance-none bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-1.5 pr-7 text-xs text-white/70 uppercase tracking-wider focus:outline-none focus:border-white/10 disabled:opacity-50 cursor-pointer"
           >
             {models.map((m) => (
               <option key={m} value={m} className="bg-[#060d18] text-white">
@@ -80,7 +80,7 @@ export default function SimulatePanel({
           <button
             onClick={isComplete || isError ? onReset : onSimulate}
             disabled={disabled || isRunning}
-            className="flex items-center gap-2 rounded-lg bg-white/10 border border-white/[0.06] px-4 py-1.5 text-[10px] text-white uppercase tracking-wider transition-colors hover:bg-white/[0.15] disabled:opacity-40"
+            className="flex items-center gap-2 rounded-lg bg-white/10 border border-white/[0.06] px-4 py-1.5 text-xs text-white uppercase tracking-wider transition-colors hover:bg-white/[0.15] disabled:opacity-40"
           >
             {isComplete ? (
               <>
@@ -107,10 +107,10 @@ export default function SimulatePanel({
             <Loader2 className="h-3.5 w-3.5 text-white/50 animate-spin flex-shrink-0" />
             <div className="flex-1">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[9px] text-white/40">
+                <span className="text-[10px] text-white/60">
                   {PHASE_LABELS[status.phase] || status.message || 'Processing...'}
                 </span>
-                <span className="text-[9px] text-white/30">{status.progress}%</span>
+                <span className="text-[10px] text-white/50">{status.progress}%</span>
               </div>
               <div className="w-full h-1 rounded-full bg-white/[0.06] overflow-hidden">
                 <div
@@ -119,7 +119,7 @@ export default function SimulatePanel({
                 />
               </div>
               {status.partial && status.partial.agents_total > 0 && (
-                <span className="text-[8px] text-white/20 mt-0.5 block">
+                <span className="text-[9px] text-white/40 mt-0.5 block">
                   Agents: {status.partial.agents_done}/{status.partial.agents_total}
                 </span>
               )}
@@ -131,7 +131,7 @@ export default function SimulatePanel({
         {isRunning && !status && (
           <div className="flex items-center gap-2 min-w-[140px]">
             <Loader2 className="h-3.5 w-3.5 text-white/50 animate-spin" />
-            <span className="text-[9px] text-white/40">Starting simulation...</span>
+            <span className="text-[10px] text-white/60">Starting simulation...</span>
           </div>
         )}
 
@@ -139,7 +139,7 @@ export default function SimulatePanel({
         {isError && error && (
           <>
             <div className="h-6 w-px bg-white/[0.06]" />
-            <span className="text-[9px] text-red-400/70 max-w-[200px] truncate">
+            <span className="text-[10px] text-red-400/70 max-w-[200px] truncate">
               {error}
             </span>
           </>

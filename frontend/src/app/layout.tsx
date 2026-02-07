@@ -11,8 +11,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Evee — Sustainability Urban Transparency Building Simulator",
-  description: "Blueprint your sustainable city. Evee is an urban transparency building simulator for sustainability-focused urban planning.",
+  title: "Vireon — Urban Transparency Simulator",
+  description: "Blueprint your sustainable city. Vireon is an urban transparency building simulator for sustainability-focused urban planning.",
 };
 
 export default function RootLayout({
