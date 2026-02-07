@@ -42,3 +42,4 @@ backboard_info.md
 bb_moreinfo.md
 links_to_buildings.txt
 *.pem
+.env

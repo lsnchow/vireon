@@ -3,11 +3,14 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import type { PickingInfo } from '@deck.gl/core';
 import { useCivicLens } from '@/hooks/useCivicLens';
+import { useSimulation } from '@/hooks/useSimulation';
 import MapView from '@/components/map/MapView';
 import PlacementToolbar from '@/components/map/PlacementToolbar';
 import ScenarioBar from '@/components/map/ScenarioBar';
 import ImpactScorecard from '@/components/map/ImpactScorecard';
 import HoverTooltip from '@/components/map/HoverTooltip';
+import SimulatePanel from '@/components/map/SimulatePanel';
+import AgentReactionCards from '@/components/map/AgentReactionCards';
 import { KINGSTON_CENTER } from '@/types/map';
 import type { ImpactResult, RenderableBuilding } from '@/types/map';
 import { getBuildingById, getEffectiveFootprint } from '@/data/buildings';
@@ -46,6 +49,17 @@ export default function CivicLensApp({
     setMitigation,
     applyMitigation,
   } = useCivicLens();
+
+  /* ── Simulation (agent reactions) ── */
+  const sim = useSimulation();
+  const [showAgentCards, setShowAgentCards] = useState(false);
+
+  // Auto-show agent cards when simulation completes
+  useEffect(() => {
+    if (sim.phase === 'complete' && sim.result) {
+      setShowAgentCards(true);
+    }
+  }, [sim.phase, sim.result]);
 
   const initialPlacedRef = useRef(false);
 
@@ -186,6 +200,21 @@ export default function CivicLensApp({
     }
   }, [selectedBuilding, state.impacts, setMitigation, applyMitigation]);
 
+  /* ── Selected building impact ── */
+  const selectedImpact = selectedBuilding
+    ? state.impacts[selectedBuilding.id] ?? null
+    : null;
+
+  const selectedTemplateName = selectedBuilding
+    ? getBuildingById(selectedBuilding.templateId)?.name ?? 'Building'
+    : '';
+
+  /* ── Simulation trigger ── */
+  const handleSimulate = useCallback(() => {
+    if (!selectedBuilding || !selectedImpact) return;
+    sim.simulate(selectedBuilding, selectedImpact);
+  }, [selectedBuilding, selectedImpact, sim]);
+
   /* ── Hover state ── */
   const [hoverInfo, setHoverInfo] = useState<{
     x: number;
@@ -227,15 +256,6 @@ export default function CivicLensApp({
     [state.impacts]
   );
 
-  /* ── Selected building impact ── */
-  const selectedImpact = selectedBuilding
-    ? state.impacts[selectedBuilding.id] ?? null
-    : null;
-
-  const selectedTemplateName = selectedBuilding
-    ? getBuildingById(selectedBuilding.templateId)?.name ?? 'Building'
-    : '';
-
   return (
     <div className="relative h-screen w-screen overflow-hidden font-mono">
       {/* Map layer */}
@@ -264,6 +284,7 @@ export default function CivicLensApp({
           impact={selectedImpact}
           mitigation={state.mitigation}
           buildingName={selectedTemplateName}
+          aggregateResult={sim.result?.aggregate ?? null}
         />
       )}
 
@@ -276,6 +297,30 @@ export default function CivicLensApp({
           onDeselect={() => selectBuilding(null)}
           onMitigate={handleMitigate}
           impactScore={selectedImpact?.overallAcceptance}
+        />
+      )}
+
+      {/* Simulate panel (model selector + progress bar) */}
+      {selectedBuilding && selectedImpact && (
+        <SimulatePanel
+          phase={sim.phase}
+          selectedModel={sim.selectedModel}
+          onModelChange={sim.setSelectedModel}
+          models={sim.models}
+          status={sim.status}
+          error={sim.error}
+          onSimulate={handleSimulate}
+          onReset={sim.reset}
+          disabled={!selectedImpact}
+        />
+      )}
+
+      {/* Agent reaction cards (shown after simulation) */}
+      {showAgentCards && sim.result && (
+        <AgentReactionCards
+          agents={sim.result.agents}
+          aggregate={sim.result.aggregate}
+          onClose={() => setShowAgentCards(false)}
         />
       )}
 

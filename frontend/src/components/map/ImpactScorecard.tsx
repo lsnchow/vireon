@@ -15,6 +15,7 @@ import {
   Activity,
 } from 'lucide-react';
 import type { ImpactResult, CriterionResult, MitigationResult } from '@/types/map';
+import type { AggregateResult } from '@/types/simulation';
 
 /* ── Score helpers ── */
 function scoreColor(score: number, higherIsWorse: boolean): string {
@@ -206,17 +207,26 @@ function CriterionRow({
   );
 }
 
+/* ── Blended score helper ── */
+function blendedScoreColor(score: number): string {
+  if (score >= 60) return 'text-emerald-400';
+  if (score >= 40) return 'text-amber-400';
+  return 'text-red-400';
+}
+
 /* ── Main scorecard ── */
 interface ImpactScorecardProps {
   impact: ImpactResult | null;
   mitigation: MitigationResult | null;
   buildingName: string;
+  aggregateResult?: AggregateResult | null;
 }
 
 export default function ImpactScorecard({
   impact,
   mitigation,
   buildingName,
+  aggregateResult,
 }: ImpactScorecardProps) {
   if (!impact) {
     return (
@@ -252,6 +262,29 @@ export default function ImpactScorecard({
       <div className="px-4 py-4 border-b border-white/[0.04]">
         <CircularGauge score={impact.overallAcceptance} />
       </div>
+
+      {/* Blended score (shown after simulation) */}
+      {aggregateResult && (
+        <div className="px-4 py-3 border-b border-white/[0.04] bg-white/[0.015]">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-[8px] text-white/25 uppercase tracking-wider">Sentiment</span>
+              <div className={`text-sm font-bold ${blendedScoreColor(aggregateResult.sentiment_score)}`}>
+                {Math.round(aggregateResult.sentiment_score)}
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="text-[8px] text-white/25 uppercase tracking-wider">Final Blended</span>
+              <div className={`text-sm font-bold ${blendedScoreColor(aggregateResult.final_score)}`}>
+                {Math.round(aggregateResult.final_score)}
+              </div>
+            </div>
+          </div>
+          <p className="text-[8px] text-white/20 mt-1">
+            70% deterministic + 30% stakeholder sentiment
+          </p>
+        </div>
+      )}
 
       {/* Criteria list */}
       <div>
