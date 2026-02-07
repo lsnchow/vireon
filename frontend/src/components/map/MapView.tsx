@@ -8,7 +8,8 @@ import { AmbientLight, PointLight, LightingEffect } from '@deck.gl/core';
 import type { MapViewState, PickingInfo } from '@deck.gl/core';
 
 import { getTransformedFootprint } from '@/lib/geo';
-import { getBuildingById } from '@/data/buildings';
+import { getBuildingById, getEffectiveFootprint } from '@/data/buildings';
+import { getFootprintById } from '@/data/footprint-library';
 import type { PlacedBuilding, RenderableBuilding, OverlayToggles } from '@/types/map';
 import { KINGSTON_VIEW_STATE, MAP_STYLE } from '@/types/map';
 import type { FeatureCollection } from '@/lib/geo-analysis';
@@ -104,11 +105,12 @@ export default function MapView({
       .map((pb) => {
         const template = getBuildingById(pb.templateId);
         if (!template) return null;
+        const footprint = getEffectiveFootprint(template, getFootprintById);
         return {
           id: pb.id,
           templateId: pb.templateId,
           polygon: getTransformedFootprint(
-            template.footprintMeters,
+            footprint,
             pb.center,
             pb.rotation
           ),

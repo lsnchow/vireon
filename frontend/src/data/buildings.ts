@@ -68,6 +68,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     description: 'Neoclassical civic landmark and municipal government seat in Market Square.',
     costEstimate: 0,
     sketchfabUid: '5303dd0b15304264ac649ba248a1871c', // Post Office Bugojno
+    footprintShapeId: 'shape_nyc_001', // 40pts, 48x42m complex civic shape
     footprintMeters: [
       [-27.5, -15],
       [27.5, -15],
@@ -85,6 +86,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     description: "Queen's University assembly hall and campus landmark.",
     costEstimate: 0,
     sketchfabUid: 'c6b0308c2ebb4842ae49aff70ce14ad0', // Modern Office Building
+    footprintShapeId: 'shape_nyc_004', // 32pts, 47x48m campus building shape
     footprintMeters: [
       [-22.5, -17.5],
       [22.5, -17.5],
@@ -102,6 +104,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     description: 'Arena / entertainment venue, ~120 m x 90 m.',
     costEstimate: 46000000,
     sketchfabUid: '770acf6b0da74af397f748d95141f8be', // Industrial Building
+    footprintShapeId: 'shape_nyc_005', // 84pts, 82x69m large complex arena
     footprintMeters: [
       [-60, -45],
       [60, -45],
@@ -119,6 +122,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     description: 'High-rise residential condo tower with lake views.',
     costEstimate: 35000000,
     sketchfabUid: '147b38a4cc1149f3af52734e0d581866', // High-Rise Office Building Raduga
+    footprintShapeId: 'shape_nyc_015', // 22pts, 36x36m tower footprint
     footprintMeters: [
       [-15, -10],
       [15, -10],
@@ -136,6 +140,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     description: 'Mixed-use street-front commercial with residential above.',
     costEstimate: 5000000,
     sketchfabUid: '168f378f03f24f1280e76c824b3cf7fc', // Modern Low-Rise Condo 1
+    footprintShapeId: 'shape_nyc_011', // 21pts, 31x75m elongated street block
     footprintMeters: [
       [-30, -7.5],
       [30, -7.5],
@@ -153,6 +158,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     description: 'L-shaped heritage courthouse, a Frontenac County landmark.',
     costEstimate: 0,
     sketchfabUid: '154fb8d55bc144e78f9c19e56637b6a4', // Modular Industrial Building
+    footprintShapeId: 'shape_nyc_020', // 19pts, 47x62m irregular civic shape
     footprintMeters: [
       [-25, -20],
       [25, -20],
@@ -172,6 +178,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     description: 'Mid-to-high rise mixed-use building with ground-floor retail.',
     costEstimate: 42000000,
     sketchfabUid: '9e891744efb04f359c88aaed25c0b53f', // Low-Rise Modern Condo 3
+    footprintShapeId: 'shape_nyc_010', // 10pts, 30x26m clean tower shape
     footprintMeters: [
       [-20, -12.5],
       [20, -12.5],
@@ -189,6 +196,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     description: 'Midrise residential building near key amenities and transit.',
     costEstimate: 21000000,
     sketchfabUid: '2aaa4c5fb7c24e829973ea4576db41ba', // Low-Rise Modern Condo 2
+    footprintShapeId: 'shape_nyc_025', // 19pts, 38x36m residential shape
     footprintMeters: [
       [-20, -12.5],
       [20, -12.5],
@@ -206,6 +214,7 @@ export const BUILDINGS: BuildingTemplate[] = [
     description: 'Retail/services commercial development near downtown.',
     costEstimate: 8000000,
     sketchfabUid: '1ae7f2998d6d400a90b3f7c462085093', // Kodiak Condos
+    footprintShapeId: 'shape_nyc_018', // 12pts, 54x36m commercial block
     footprintMeters: [
       [-20, -10],
       [20, -10],
@@ -217,6 +226,23 @@ export const BUILDINGS: BuildingTemplate[] = [
 
 export function getBuildingById(id: string): BuildingTemplate | undefined {
   return BUILDINGS.find((b) => b.id === id);
+}
+
+/**
+ * Get the effective footprint for a building template.
+ * Returns the library shape if the footprint library has been loaded and
+ * the template has a `footprintShapeId`, otherwise the template's built-in
+ * `footprintMeters` fallback.
+ */
+export function getEffectiveFootprint(
+  template: BuildingTemplate,
+  getShapeById?: (id: string) => { footprintMeters: [number, number][] } | undefined,
+): [number, number][] {
+  if (template.footprintShapeId && getShapeById) {
+    const shape = getShapeById(template.footprintShapeId);
+    if (shape) return shape.footprintMeters;
+  }
+  return template.footprintMeters;
 }
 
 /** Add a custom building template at runtime */

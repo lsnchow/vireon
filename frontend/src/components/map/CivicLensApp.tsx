@@ -11,8 +11,9 @@ import ImpactScorecard from '@/components/map/ImpactScorecard';
 import HoverTooltip from '@/components/map/HoverTooltip';
 import { KINGSTON_CENTER } from '@/types/map';
 import type { ImpactResult, RenderableBuilding } from '@/types/map';
-import { getBuildingById } from '@/data/buildings';
+import { getBuildingById, getEffectiveFootprint } from '@/data/buildings';
 import { getTransformedFootprint } from '@/lib/geo';
+import { loadFootprintLibrary, getFootprintById } from '@/data/footprint-library';
 import {
   computeAllImpacts,
   suggestMitigation,
@@ -80,6 +81,12 @@ export default function CivicLensApp({
     }
   }, [initialBuildingId, heightOverride, state.placedBuildings, updateBuilding]);
 
+  /* ── Preload footprint shape library ── */
+  const [footprintsReady, setFootprintsReady] = useState(false);
+  useEffect(() => {
+    loadFootprintLibrary().then(() => setFootprintsReady(true));
+  }, []);
+
   /* ── GeoJSON layers (shared between MapView and impact engine) ── */
   const [layers, setLayers] = useState<CityLayers>({
     parks: null,
@@ -126,8 +133,9 @@ export default function CivicLensApp({
       const template = getBuildingById(pb.templateId);
       if (!template) continue;
 
+      const footprint = getEffectiveFootprint(template, getFootprintById);
       const polygon = getTransformedFootprint(
-        template.footprintMeters,
+        footprint,
         pb.center,
         pb.rotation
       );
@@ -145,7 +153,7 @@ export default function CivicLensApp({
     }
 
     setImpacts(newImpacts);
-  }, [state.placedBuildings, layers, setImpacts]);
+  }, [state.placedBuildings, layers, footprintsReady, setImpacts]);
 
   /* ── Add building at Kingston centre ── */
   const handleAddBuilding = useCallback(
@@ -161,8 +169,9 @@ export default function CivicLensApp({
     const template = getBuildingById(selectedBuilding.templateId);
     if (!template) return;
 
+    const footprint = getEffectiveFootprint(template, getFootprintById);
     const polygon = getTransformedFootprint(
-      template.footprintMeters,
+      footprint,
       selectedBuilding.center,
       selectedBuilding.rotation
     );

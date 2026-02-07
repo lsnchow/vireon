@@ -10,6 +10,22 @@ export type BuildingType =
   | 'mixed'
   | 'industrial';
 
+/* -- Footprint shape from the shape library -- */
+export interface FootprintShape {
+  id: string;
+  label: string;
+  footprintMeters: [number, number][];
+  source: {
+    provider: string;
+    source_index?: number;
+    originalHeight?: number;
+  };
+  stats: {
+    points: number;
+    areaM2Est: number;
+  };
+}
+
 /* -- Building template (library entry, internal) -- */
 export interface BuildingTemplate {
   id: string;
@@ -25,6 +41,8 @@ export interface BuildingTemplate {
   params?: Record<string, number | string>;
   /** Sketchfab model UID for 3D preview in the renderer */
   sketchfabUid?: string;
+  /** ID of a shape from the footprint shape library (overrides footprintMeters at runtime) */
+  footprintShapeId?: string;
 }
 
 /* -- Building definition from JSON (PRD format) -- */
