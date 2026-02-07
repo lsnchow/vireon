@@ -67,20 +67,20 @@ function buildImpactPayload(impact: ImpactResult): SimulateImpactPayload {
       deterministic_acceptance: impact.overallAcceptance,
     },
     drivers: {
-      d_to_park_m: driverMap['Dist to park'] ?? driverMap['d_park'] ?? 9999,
-      d_to_water_m: driverMap['Dist to water'] ?? driverMap['d_water'] ?? 9999,
-      overlap_sensitive_m2: driverMap['Overlap sensitive'] ?? 0,
-      d_to_major_road_m: driverMap['Dist to road'] ?? driverMap['d_road'] ?? 9999,
-      d_to_residential_m: driverMap['Dist to residential'] ?? driverMap['d_res'] ?? 9999,
-      intensity: driverMap['Intensity'] ?? driverMap['intensity'] ?? 0,
-      center_proximity_score: driverMap['Proximity'] ?? driverMap['proximity'] ?? 0,
+      d_to_park_m: Math.min(driverMap['Distance to nearest park/green'] ?? driverMap['Dist to park'] ?? 500, 2000),
+      d_to_water_m: Math.min(driverMap['Distance to nearest waterway'] ?? driverMap['Dist to water'] ?? 500, 2000),
+      overlap_sensitive_m2: driverMap['Overlap with sensitive area'] ?? driverMap['Overlap sensitive'] ?? 0,
+      d_to_major_road_m: Math.min(driverMap['Distance to major road'] ?? driverMap['Dist to road'] ?? 200, 2000),
+      d_to_residential_m: Math.min(driverMap['Distance to residential zone'] ?? driverMap['Dist to residential'] ?? 300, 2000),
+      intensity: driverMap['Building intensity (area × height)'] ?? driverMap['Intensity'] ?? 0,
+      center_proximity_score: driverMap['Centre proximity score'] ?? driverMap['Proximity'] ?? 0,
     },
     flags: {
       near_sensitive_zone:
-        (driverMap['Dist to park'] ?? 9999) < 200 ||
-        (driverMap['Dist to water'] ?? 9999) < 200,
-      near_residential: (driverMap['Dist to residential'] ?? 9999) < 150,
-      near_major_road: (driverMap['Dist to road'] ?? 9999) < 100,
+        (driverMap['Distance to nearest park/green'] ?? 500) < 200 ||
+        (driverMap['Distance to nearest waterway'] ?? 500) < 200,
+      near_residential: (driverMap['Distance to residential zone'] ?? 300) < 150,
+      near_major_road: (driverMap['Distance to major road'] ?? 200) < 100,
     },
   };
 }

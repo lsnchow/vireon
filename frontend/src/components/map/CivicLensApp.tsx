@@ -269,14 +269,29 @@ export default function CivicLensApp({
         cityLayers={layers}
       />
 
-      {/* Scenario & overlay controls hidden for now */}
-      {/* <ScenarioBar
-        activeScenarioId={state.activeScenarioId}
-        overlays={state.overlays}
-        onLoadScenario={loadScenario}
-        onClearAll={clearAll}
-        onToggleOverlay={toggleOverlay}
-      /> */}
+      {/* Overlay toggles (top-right) */}
+      <div className="fixed right-4 top-4 z-50">
+        <div className="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-[rgba(6,13,24,0.85)] p-1.5 shadow-lg backdrop-blur-xl">
+          {([
+            { key: 'parks' as const, label: 'Parks', color: 'bg-green-600/30 text-green-300 border-green-500/50', icon: '🌳' },
+            { key: 'waterways' as const, label: 'Water', color: 'bg-blue-600/30 text-blue-300 border-blue-500/50', icon: '💧' },
+            { key: 'residential' as const, label: 'Residential', color: 'bg-red-600/20 text-red-300 border-red-500/50', icon: '🏠' },
+            { key: 'corridors' as const, label: 'Roads', color: 'bg-orange-600/20 text-orange-300 border-orange-500/50', icon: '🛣' },
+          ]).map(({ key, label, color }) => (
+            <button
+              key={key}
+              onClick={() => toggleOverlay(key)}
+              className={`flex items-center gap-1 rounded-md border px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider transition-colors ${
+                state.overlays[key]
+                  ? color
+                  : 'border-transparent text-white/40 hover:bg-white/[0.06] hover:text-white'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Impact scorecard (right side, shown after simulation completes) */}
       {selectedBuilding && sim.phase === 'complete' && (

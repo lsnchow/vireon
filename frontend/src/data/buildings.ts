@@ -59,34 +59,16 @@ function geojsonToMeterOffsets(coordinates: number[][][]): {
  */
 export const BUILDINGS: BuildingTemplate[] = [
   {
-    id: 'bldg_city_hall',
-    name: 'Kingston City Hall',
-    type: 'civic',
-    defaultHeight: 14,
-    floors: 3,
-    color: TYPE_COLORS.civic,
-    description: 'Neoclassical civic landmark and municipal government seat in Market Square.',
-    costEstimate: 0,
-    sketchfabUid: '5303dd0b15304264ac649ba248a1871c', // Post Office Bugojno
-    footprintShapeId: 'shape_nyc_001', // 40pts, 48x42m complex civic shape
-    footprintMeters: [
-      [-27.5, -15],
-      [27.5, -15],
-      [27.5, 15],
-      [-27.5, 15],
-    ],
-  },
-  {
-    id: 'bldg_grant_hall',
-    name: 'Grant Hall',
-    type: 'educational',
-    defaultHeight: 18,
-    floors: 3,
-    color: TYPE_COLORS.educational,
-    description: "Queen's University assembly hall and campus landmark.",
-    costEstimate: 0,
-    sketchfabUid: 'c6b0308c2ebb4842ae49aff70ce14ad0', // Modern Office Building
-    footprintShapeId: 'shape_nyc_004', // 32pts, 47x48m campus building shape
+    id: 'bldg_eleven_condo',
+    name: 'Vertex Condominiums',
+    type: 'residential',
+    defaultHeight: 33,
+    floors: 11,
+    color: TYPE_COLORS.residential,
+    description: '11-story residential condominium with modern glass facade.',
+    costEstimate: 38000000,
+    sketchfabUid: 'c6b0308c2ebb4842ae49aff70ce14ad0',
+    footprintShapeId: 'shape_nyc_004',
     footprintMeters: [
       [-22.5, -17.5],
       [22.5, -17.5],
@@ -95,16 +77,16 @@ export const BUILDINGS: BuildingTemplate[] = [
     ],
   },
   {
-    id: 'bldg_leon_centre',
-    name: "Leon's Centre",
-    type: 'commercial',
-    defaultHeight: 25,
+    id: 'bldg_warehouse',
+    name: 'Halcyon Warehouse',
+    type: 'industrial',
+    defaultHeight: 12,
     floors: 4,
-    color: TYPE_COLORS.commercial,
-    description: 'Arena / entertainment venue, ~120 m x 90 m.',
-    costEstimate: 46000000,
-    sketchfabUid: '770acf6b0da74af397f748d95141f8be', // Industrial Building
-    footprintShapeId: 'shape_nyc_005', // 84pts, 82x69m large complex arena
+    color: TYPE_COLORS.industrial,
+    description: 'Industrial warehouse with high ceilings and freight access.',
+    costEstimate: 9500000,
+    sketchfabUid: '770acf6b0da74af397f748d95141f8be',
+    footprintShapeId: 'shape_nyc_005',
     footprintMeters: [
       [-60, -45],
       [60, -45],
@@ -113,34 +95,16 @@ export const BUILDINGS: BuildingTemplate[] = [
     ],
   },
   {
-    id: 'bldg_waterfront_tower',
-    name: 'Waterfront Tower',
-    type: 'residential',
-    defaultHeight: 50,
-    floors: 15,
-    color: TYPE_COLORS.residential,
-    description: 'High-rise residential condo tower with lake views.',
-    costEstimate: 35000000,
-    sketchfabUid: '147b38a4cc1149f3af52734e0d581866', // High-Rise Office Building Raduga
-    footprintShapeId: 'shape_nyc_015', // 22pts, 36x36m tower footprint
-    footprintMeters: [
-      [-15, -10],
-      [15, -10],
-      [15, 10],
-      [-15, 10],
-    ],
-  },
-  {
-    id: 'bldg_princess_block',
-    name: 'Princess St. Block',
-    type: 'mixed_use',
-    defaultHeight: 8,
+    id: 'bldg_industrial_block',
+    name: 'Foundry Block',
+    type: 'industrial',
+    defaultHeight: 6,
     floors: 2,
-    color: TYPE_COLORS.mixed_use,
-    description: 'Mixed-use street-front commercial with residential above.',
-    costEstimate: 5000000,
-    sketchfabUid: '168f378f03f24f1280e76c824b3cf7fc', // Modern Low-Rise Condo 1
-    footprintShapeId: 'shape_nyc_011', // 21pts, 31x75m elongated street block
+    color: TYPE_COLORS.industrial,
+    description: 'Low-profile industrial block with modular layout.',
+    costEstimate: 4200000,
+    sketchfabUid: '168f378f03f24f1280e76c824b3cf7fc',
+    footprintShapeId: 'shape_nyc_011',
     footprintMeters: [
       [-30, -7.5],
       [30, -7.5],
@@ -149,16 +113,16 @@ export const BUILDINGS: BuildingTemplate[] = [
     ],
   },
   {
-    id: 'bldg_courthouse',
-    name: 'Frontenac Courthouse',
-    type: 'civic',
-    defaultHeight: 15,
-    floors: 3,
-    color: TYPE_COLORS.civic,
-    description: 'L-shaped heritage courthouse, a Frontenac County landmark.',
-    costEstimate: 0,
-    sketchfabUid: '154fb8d55bc144e78f9c19e56637b6a4', // Modular Industrial Building
-    footprintShapeId: 'shape_nyc_020', // 19pts, 47x62m irregular civic shape
+    id: 'bldg_lowrise_industrial',
+    name: 'Slate Works',
+    type: 'residential',
+    defaultHeight: 3,
+    floors: 2,
+    color: TYPE_COLORS.residential,
+    description: 'Compact 2-story structure suited for light industrial or residential conversion.',
+    costEstimate: 1800000,
+    sketchfabUid: '154fb8d55bc144e78f9c19e56637b6a4',
+    footprintShapeId: 'shape_nyc_020',
     footprintMeters: [
       [-25, -20],
       [25, -20],
@@ -169,57 +133,39 @@ export const BUILDINGS: BuildingTemplate[] = [
     ],
   },
   {
-    id: 'bldg_midrise_a',
-    name: 'Midrise Tower A',
-    type: 'residential',
-    defaultHeight: 38,
-    floors: 12,
-    color: TYPE_COLORS.residential,
-    description: 'Mid-to-high rise mixed-use building with ground-floor retail.',
-    costEstimate: 42000000,
-    sketchfabUid: '9e891744efb04f359c88aaed25c0b53f', // Low-Rise Modern Condo 3
-    footprintShapeId: 'shape_nyc_010', // 10pts, 30x26m clean tower shape
-    footprintMeters: [
-      [-20, -12.5],
-      [20, -12.5],
-      [20, 12.5],
-      [-20, 12.5],
-    ],
-  },
-  {
-    id: 'bldg_midrise_b',
-    name: 'Midrise Residential B',
-    type: 'residential',
-    defaultHeight: 22,
-    floors: 7,
-    color: TYPE_COLORS.residential,
-    description: 'Midrise residential building near key amenities and transit.',
-    costEstimate: 21000000,
-    sketchfabUid: '2aaa4c5fb7c24e829973ea4576db41ba', // Low-Rise Modern Condo 2
-    footprintShapeId: 'shape_nyc_025', // 19pts, 38x36m residential shape
-    footprintMeters: [
-      [-20, -12.5],
-      [20, -12.5],
-      [20, 12.5],
-      [-20, 12.5],
-    ],
-  },
-  {
-    id: 'bldg_commercial_c',
-    name: 'Commercial Centre C',
-    type: 'commercial',
+    id: 'bldg_midrise_tower',
+    name: 'Arden Tower',
+    type: 'mixed_use',
     defaultHeight: 12,
-    floors: 3,
-    color: TYPE_COLORS.commercial,
-    description: 'Retail/services commercial development near downtown.',
-    costEstimate: 8000000,
-    sketchfabUid: '1ae7f2998d6d400a90b3f7c462085093', // Kodiak Condos
-    footprintShapeId: 'shape_nyc_018', // 12pts, 54x36m commercial block
+    floors: 4,
+    color: TYPE_COLORS.mixed_use,
+    description: 'Mid-rise mixed-use tower with ground-floor retail and upper residences.',
+    costEstimate: 14000000,
+    sketchfabUid: '9e891744efb04f359c88aaed25c0b53f',
+    footprintShapeId: 'shape_nyc_010',
     footprintMeters: [
-      [-20, -10],
-      [20, -10],
-      [20, 10],
-      [-20, 10],
+      [-20, -12.5],
+      [20, -12.5],
+      [20, 12.5],
+      [-20, 12.5],
+    ],
+  },
+  {
+    id: 'bldg_midrise_res',
+    name: 'Clover Residences',
+    type: 'residential',
+    defaultHeight: 9,
+    floors: 3,
+    color: TYPE_COLORS.residential,
+    description: 'Mid-rise residential building with courtyard access and transit proximity.',
+    costEstimate: 8500000,
+    sketchfabUid: '2aaa4c5fb7c24e829973ea4576db41ba',
+    footprintShapeId: 'shape_nyc_025',
+    footprintMeters: [
+      [-20, -12.5],
+      [20, -12.5],
+      [20, 12.5],
+      [-20, 12.5],
     ],
   },
 ];

@@ -147,43 +147,19 @@ export default function RendererPage() {
                     onClick={() => handleSelectBuilding(building)}
                     disabled={isLoading}
                     className={cn(
-                      "flex items-center gap-3 w-full p-3 rounded-lg border text-left transition-all",
+                      "flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border text-left transition-all",
                       isSelected
                         ? "border-white/20 bg-white/[0.06]"
                         : "border-white/[0.06] bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]",
                       isLoading && "opacity-60 cursor-wait"
                     )}
                   >
-                    {/* Color indicator */}
-                    <div
-                      className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 border border-white/[0.06]"
-                      style={{
-                        backgroundColor: `rgba(${building.color[0]}, ${building.color[1]}, ${building.color[2]}, 0.15)`,
-                      }}
-                    >
-                      {isLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-white/50" />
-                      ) : (
-                        <svg className="w-5 h-5 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
-                        </svg>
-                      )}
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium text-white truncate">
-                        {building.name}
-                      </div>
-                      <span className="text-[10px] text-white/30">
-                        {building.floors}F &middot; {building.defaultHeight}m
-                      </span>
-                      {building.description && (
-                        <p className="text-[9px] text-white/25 mt-0.5 line-clamp-1 leading-tight">
-                          {building.description}
-                        </p>
-                      )}
-                    </div>
+                    {isLoading && (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white/50 flex-shrink-0" />
+                    )}
+                    <span className="text-xs font-medium text-white truncate">
+                      {building.name}
+                    </span>
                   </button>
                 );
               })}

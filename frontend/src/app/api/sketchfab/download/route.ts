@@ -46,7 +46,6 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
 
     const downloadUrl = data.glb?.url || data.gltf?.url;
-
     if (!downloadUrl) {
       return NextResponse.json(
         { error: "No downloadable format available" },
