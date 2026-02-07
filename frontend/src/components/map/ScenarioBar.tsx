@@ -61,41 +61,41 @@ export default function ScenarioBar({
 }: ScenarioBarProps) {
   return (
     <div className="fixed right-4 top-4 z-50 flex flex-col gap-2">
-      <div className="flex items-center gap-1.5 rounded-lg border border-[#2a2a3e] bg-[#12121a]/90 p-1.5 shadow-lg backdrop-blur-md">
-        <MapPin className="mx-1 h-4 w-4 text-[#6c63ff]" />
+      <div className="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-[rgba(6,13,24,0.85)] p-1.5 shadow-lg backdrop-blur-xl">
+        <MapPin className="mx-1 h-4 w-4 text-white/30" />
         {SCENARIOS.map((scenario) => (
           <button
             key={scenario.id}
             onClick={() => onLoadScenario(scenario)}
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`rounded-md px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider transition-colors ${
               activeScenarioId === scenario.id
-                ? 'bg-[#6c63ff] text-white shadow-md'
-                : 'text-[#9898b0] hover:bg-[#1a1a2e] hover:text-[#e8e8f0]'
+                ? 'bg-white/10 text-white border border-white/10'
+                : 'text-white/40 hover:bg-white/[0.06] hover:text-white'
             }`}
             title={scenario.description}
           >
             {scenario.name}
           </button>
         ))}
-        <div className="mx-0.5 h-5 w-px bg-[#2a2a3e]" />
+        <div className="mx-0.5 h-5 w-px bg-white/[0.06]" />
         <button
           onClick={onClearAll}
-          className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-[#ff4757] transition-colors hover:bg-[#ff4757]/10"
+          className="flex items-center gap-1 rounded-md px-2 py-1.5 text-[10px] font-mono uppercase tracking-wider text-red-400/70 transition-colors hover:bg-red-400/10"
         >
           <Eraser className="h-3.5 w-3.5" />
           Clear
         </button>
       </div>
 
-      <div className="flex items-center gap-1.5 rounded-lg border border-[#2a2a3e] bg-[#12121a]/90 p-1.5 shadow-lg backdrop-blur-md">
+      <div className="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-[rgba(6,13,24,0.85)] p-1.5 shadow-lg backdrop-blur-xl">
         {OVERLAY_BUTTONS.map(({ key, label, icon, activeColor }) => (
           <button
             key={key}
             onClick={() => onToggleOverlay(key)}
-            className={`flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ${
+            className={`flex items-center gap-1 rounded-md border px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider transition-colors ${
               overlays[key]
                 ? activeColor
-                : 'border-transparent text-[#9898b0] hover:bg-[#1a1a2e] hover:text-[#e8e8f0]'
+                : 'border-transparent text-white/40 hover:bg-white/[0.06] hover:text-white'
             }`}
           >
             {icon}

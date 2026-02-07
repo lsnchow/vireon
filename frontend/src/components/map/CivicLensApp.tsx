@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useState, useRef } from 'react';
 import type { PickingInfo } from '@deck.gl/core';
 import { useCivicLens } from '@/hooks/useCivicLens';
 import MapView from '@/components/map/MapView';
-import BuildingLibrary from '@/components/map/BuildingLibrary';
 import PlacementToolbar from '@/components/map/PlacementToolbar';
 import ScenarioBar from '@/components/map/ScenarioBar';
 import ImpactScorecard from '@/components/map/ImpactScorecard';
@@ -43,15 +42,11 @@ export default function CivicLensApp({
     loadScenario,
     clearAll,
     toggleOverlay,
-    toggleSidebar,
     setImpacts,
     setMitigation,
     applyMitigation,
   } = useCivicLens();
 
-  /* ── Whether user arrived from the renderer with a pre-selected building ── */
-  const hasInitialBuilding = Boolean(initialBuildingId);
-  const [showLibrary, setShowLibrary] = useState(!hasInitialBuilding);
   const initialPlacedRef = useRef(false);
 
   /* ── Auto-place the initial building from renderer ── */
@@ -155,14 +150,6 @@ export default function CivicLensApp({
     setImpacts(newImpacts);
   }, [state.placedBuildings, layers, footprintsReady, setImpacts]);
 
-  /* ── Add building at Kingston centre ── */
-  const handleAddBuilding = useCallback(
-    (templateId: string) => {
-      addBuilding(templateId, KINGSTON_CENTER);
-    },
-    [addBuilding]
-  );
-
   /* ── Mitigate action ── */
   const handleMitigate = useCallback(() => {
     if (!selectedBuilding) return;
@@ -250,7 +237,7 @@ export default function CivicLensApp({
     : '';
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
+    <div className="relative h-screen w-screen overflow-hidden font-mono">
       {/* Map layer */}
       <MapView
         placedBuildings={state.placedBuildings}
@@ -261,26 +248,6 @@ export default function CivicLensApp({
         onHover={handleHover}
         cityLayers={layers}
       />
-
-      {/* Building Library sidebar (hidden when renderer provided a building; toggle to show) */}
-      {showLibrary && (
-        <BuildingLibrary
-          isOpen={state.sidebarOpen}
-          onToggle={toggleSidebar}
-          onAddBuilding={handleAddBuilding}
-          placedCount={state.placedBuildings.length}
-        />
-      )}
-
-      {/* Toggle library button when coming from renderer */}
-      {hasInitialBuilding && !showLibrary && (
-        <button
-          onClick={() => { setShowLibrary(true); toggleSidebar(); }}
-          className="fixed top-20 left-3 z-40 rounded-lg bg-[#12121a]/90 border border-[#2a2a3e] px-3 py-2 text-xs text-[#9898b0] hover:text-[#e8e8f0] hover:border-[#6c63ff]/40 backdrop-blur-sm transition-all"
-        >
-          Show Library
-        </button>
-      )}
 
       {/* Scenario & overlay controls (top-right) */}
       <ScenarioBar
@@ -324,21 +291,19 @@ export default function CivicLensApp({
       )}
 
       {/* Back to Catalog link */}
-      {hasInitialBuilding && (
-        <a
-          href="/renderer"
-          className="fixed top-3 left-3 z-40 flex items-center gap-1.5 rounded-lg bg-[#12121a]/90 border border-[#2a2a3e] px-3 py-2 text-xs font-mono text-[#9898b0] hover:text-[#e8e8f0] hover:border-[#6c63ff]/40 backdrop-blur-sm transition-all"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Catalog
-        </a>
-      )}
+      <a
+        href="/renderer"
+        className="fixed top-3 left-3 z-40 flex items-center gap-1.5 rounded-lg bg-[rgba(6,13,24,0.85)] border border-white/[0.06] px-3 py-2 text-[10px] font-mono text-white/40 hover:text-white hover:border-white/10 backdrop-blur-xl transition-all uppercase tracking-wider"
+      >
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Catalog
+      </a>
 
       {/* Branding watermark */}
-      <div className="pointer-events-none fixed bottom-3 right-3 z-30 text-[10px] font-medium text-[#9898b0]/50">
-        CivicLens · Kingston
+      <div className="pointer-events-none fixed bottom-3 right-3 z-30 text-[9px] font-mono font-medium text-white/20 uppercase tracking-widest">
+        Vireon · Kingston
       </div>
     </div>
   );

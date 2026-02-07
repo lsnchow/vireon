@@ -22,7 +22,7 @@ export default function HoverTooltip({
 
   return (
     <div
-      className="pointer-events-none fixed z-[60] rounded-lg border border-[#2a2a3e] bg-[#12121a]/95 px-3 py-2 shadow-xl backdrop-blur-md"
+      className="pointer-events-none fixed z-[60] rounded-lg border border-white/[0.06] bg-[rgba(6,13,24,0.9)] px-3 py-2 shadow-xl backdrop-blur-xl font-mono"
       style={{
         left: x + 12,
         top: y + 12,
@@ -31,14 +31,14 @@ export default function HoverTooltip({
     >
       {buildingName && (
         <>
-          <div className="text-xs font-medium text-[#e8e8f0] truncate">
+          <div className="text-xs font-medium text-white truncate">
             {buildingName}
           </div>
           {impact && (
             <div className="mt-1 flex items-center gap-2">
-              <span className="text-[10px] text-[#9898b0]">Acceptance:</span>
+              <span className="text-[10px] text-white/30">Acceptance:</span>
               <span
-                className={`text-xs font-mono font-bold ${
+                className={`text-xs font-bold ${
                   impact.overallAcceptance >= 60
                     ? 'text-emerald-400'
                     : impact.overallAcceptance >= 35
@@ -51,7 +51,7 @@ export default function HoverTooltip({
             </div>
           )}
           {impact && impact.topDrivers[0] && (
-            <div className="mt-0.5 text-[10px] text-[#9898b0] truncate">
+            <div className="mt-0.5 text-[10px] text-white/30 truncate">
               {impact.topDrivers[0].name}: {impact.topDrivers[0].value}{' '}
               {impact.topDrivers[0].unit}
             </div>
@@ -59,7 +59,7 @@ export default function HoverTooltip({
         </>
       )}
       {featureName && (
-        <div className="text-xs text-[#e8e8f0]">{featureName}</div>
+        <div className="text-xs text-white">{featureName}</div>
       )}
     </div>
   );

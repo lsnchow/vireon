@@ -356,7 +356,7 @@ export default function Home() {
                   <path d="M9 10h1M14 10h1M9 14h1M14 14h1" />
                 </svg>
               </div>
-              <span className="font-playfair text-2xl text-white italic">Evee</span>
+              <span className="font-mono text-lg text-white tracking-widest uppercase">Vireon</span>
             </div>
             <div className="hidden md:flex items-center gap-8">
               {["Features", "About", "Contact"].map((item) => (
@@ -365,7 +365,7 @@ export default function Home() {
                 </a>
               ))}
               <Link href="/renderer" className="wireframe-card !px-4 !py-2 font-mono text-xs text-white hover:bg-white/[0.08] transition-colors uppercase tracking-wider">
-                Launch CivicLens
+                Launch Vireon
               </Link>
             </div>
           </div>
@@ -374,43 +374,36 @@ export default function Home() {
         {/* ═══════════════════════════════════════════
             HERO — big serif text wrapping around the 3D
             ═══════════════════════════════════════════ */}
-        <section className="relative min-h-screen flex flex-col justify-center px-6">
-          <div className="max-w-7xl mx-auto w-full">
-            {/* Top-left label */}
-            <div className={`mb-6 transition-all duration-700 ${mounted ? "opacity-100" : "opacity-0"}`}>
-              <span className="font-mono text-[11px] text-white/30 uppercase tracking-[0.35em]">01 — Discipline</span>
+        <section className="relative min-h-screen flex flex-col items-center justify-center px-6 text-center">
+          <div className="max-w-4xl mx-auto w-full flex flex-col items-center">
+            {/* Top label */}
+            <div className={`mb-8 transition-all duration-700 ${mounted ? "opacity-100" : "opacity-0"}`}>
+              <span className="font-mono text-[11px] text-white/25 uppercase tracking-[0.4em]">Urban Transparency Simulator</span>
             </div>
 
-            {/* Main heading — top left */}
+            {/* Main title — centered */}
             <div className={`transition-all duration-1000 delay-200 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-              <h1 className="font-playfair text-[clamp(3rem,10vw,9rem)] text-white leading-[0.9] tracking-tight">
-                URBAN
-              </h1>
-              <h1 className="font-playfair text-[clamp(3rem,10vw,9rem)] text-white leading-[0.9] tracking-tight italic">
-                SIMULATOR
+              <h1 className="font-playfair text-[clamp(4rem,14vw,12rem)] text-white leading-[0.85] tracking-tight italic">
+                Vireon
               </h1>
             </div>
 
-            {/* Center button — overlays the 3D scene */}
-            <div className={`flex justify-center my-16 md:my-24 transition-all duration-700 delay-500 ${mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
+            {/* Tagline */}
+            <div className={`mt-6 transition-all duration-700 delay-400 ${mounted ? "opacity-100" : "opacity-0"}`}>
+              <p className="font-mono text-sm text-white/30 max-w-md mx-auto leading-relaxed tracking-wide">
+                Simulate, analyze, and visualize urban impact — one building at a time.
+              </p>
+            </div>
+
+            {/* CTA */}
+            <div className={`mt-12 transition-all duration-700 delay-500 ${mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}>
               <Link href="/renderer" className="wireframe-card !px-10 !py-4 font-mono text-sm text-white/80 hover:text-white hover:bg-white/[0.06] transition-all uppercase tracking-[0.3em]">
-                Launch CivicLens
+                Launch Vireon
               </Link>
             </div>
 
-            {/* Bottom-right text block */}
-            <div className={`flex flex-col items-end text-right transition-all duration-1000 delay-300 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-              <span className="font-mono text-[11px] text-white/30 uppercase tracking-[0.35em] mb-4">02 — Vision</span>
-              <h2 className="font-playfair text-[clamp(2.5rem,8vw,7.5rem)] text-white leading-[0.9] tracking-tight">
-                BUILDING
-              </h2>
-              <h2 className="font-playfair text-[clamp(2.5rem,8vw,7.5rem)] text-white leading-[0.9] tracking-tight italic">
-                TRANSPARENCY
-              </h2>
-            </div>
-
             {/* Scroll indicator */}
-            <div className={`flex justify-center mt-16 transition-all duration-700 delay-700 ${mounted ? "opacity-100" : "opacity-0"}`}>
+            <div className={`mt-24 transition-all duration-700 delay-700 ${mounted ? "opacity-100" : "opacity-0"}`}>
               <div className="flex flex-col items-center gap-2">
                 <span className="font-mono text-[10px] text-white/20 uppercase tracking-[0.4em]">Scroll</span>
                 <div className="w-px h-8 bg-gradient-to-b from-white/20 to-transparent animate-pulse" />
@@ -419,21 +412,19 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ═══ EVEE Title Section ═══ */}
+        {/* ═══ Vireon Mission Section ═══ */}
         <section className="py-28 px-6">
           <div className="max-w-7xl mx-auto text-center">
             <div className="font-mono text-xs text-white/20 uppercase tracking-[0.4em] mb-6">
-              Sustainability Urban Transparency Building Simulator
+              Sustainable Urban Planning
             </div>
-            <h2 className="font-playfair text-[clamp(5rem,15vw,14rem)] text-white leading-[0.85] tracking-tight italic">
-              Evee
+            <h2 className="font-playfair text-5xl sm:text-7xl text-white leading-[0.85] tracking-tight italic">
+              Blueprint your city
             </h2>
-            <p className="font-playfair text-xl sm:text-2xl text-white/40 max-w-xl mx-auto mt-6 italic">
-              Blueprint your sustainable city.
-            </p>
-            <p className="font-mono text-xs text-white/25 max-w-md mx-auto mt-4 leading-relaxed">
-              Simulate, analyze, and optimize urban environments for transparency
-              and sustainability — one building at a time.
+            <p className="font-mono text-sm text-white/30 max-w-lg mx-auto mt-6 leading-relaxed">
+              Vireon combines architectural precision with environmental science,
+              letting planners and citizens see exactly how design choices impact
+              livability, energy, and carbon footprint.
             </p>
           </div>
         </section>
@@ -487,7 +478,7 @@ export default function Home() {
               </h2>
               <div className="space-y-4 text-sm text-white/40 leading-relaxed">
                 <p>
-                  Evee was born from the idea that sustainable urban planning shouldn&apos;t happen behind closed doors.
+                  Vireon was born from the idea that sustainable urban planning shouldn&apos;t happen behind closed doors.
                   Every simulation, every data point, every decision should be transparent and accessible.
                 </p>
                 <p>
@@ -529,7 +520,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/renderer" className="wireframe-card !px-10 !py-4 bg-white/[0.05] font-mono text-sm text-white hover:bg-white/[0.12] transition-colors uppercase tracking-wider">
-                Launch Evee →
+                Launch Vireon →
               </Link>
               <button className="px-10 py-4 font-mono text-sm text-white/35 hover:text-white transition-colors uppercase tracking-wider">
                 GitHub ↗
@@ -542,8 +533,8 @@ export default function Home() {
         <footer className="border-t border-white/[0.06] py-10 px-6">
           <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="font-playfair text-xl text-white/40 italic">Evee</span>
-              <span className="font-mono text-[10px] text-white/20 uppercase tracking-widest">v4.2.0</span>
+              <span className="font-mono text-sm text-white/40 uppercase tracking-widest">Vireon</span>
+              <span className="font-mono text-[10px] text-white/20 uppercase tracking-widest">v1.0</span>
             </div>
             <div className="font-mono text-[10px] text-white/20 uppercase tracking-widest">
               Sustainability through transparency

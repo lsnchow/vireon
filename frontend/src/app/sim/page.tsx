@@ -28,8 +28,8 @@ export default function SimPage() {
   return (
     <Suspense
       fallback={
-        <div className="h-screen w-screen bg-[#0a0a0f] flex items-center justify-center">
-          <div className="text-[#6c63ff] font-mono text-sm animate-pulse">
+        <div className="h-screen w-screen bg-[#060d18] flex items-center justify-center">
+          <div className="text-white/30 font-mono text-sm animate-pulse">
             Loading simulation...
           </div>
         </div>
