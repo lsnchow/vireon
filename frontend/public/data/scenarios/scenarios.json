@@ -1,0 +1,29 @@
+[
+  {
+    "scenario_id": "scenario_a_controversial",
+    "label": "Scenario A \u2014 Controversial Placement",
+    "description": "High-rise tower placed near parks and waterfront \u2014 high environmental sensitivity and livability impact.",
+    "building_id": "bldg_midrise_a",
+    "anchor_latlng": [44.2280, -76.4760],
+    "rotation_deg": 15,
+    "height_override_m": 45
+  },
+  {
+    "scenario_id": "scenario_b_mitigated",
+    "label": "Scenario B \u2014 Mitigated Plan",
+    "description": "Same building moved away from sensitive zones and reduced in height.",
+    "building_id": "bldg_midrise_a",
+    "anchor_latlng": [44.2314, -76.4842],
+    "rotation_deg": 15,
+    "height_override_m": 30
+  },
+  {
+    "scenario_id": "scenario_c_stress",
+    "label": "Scenario C \u2014 Stress Test",
+    "description": "Extreme intensity: tallest building in the densest residential area.",
+    "building_id": "bldg_waterfront_tower",
+    "anchor_latlng": [44.2300, -76.4960],
+    "rotation_deg": 45,
+    "height_override_m": 80
+  }
+]

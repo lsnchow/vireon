@@ -1,0 +1,367 @@
+"use client";
+
+import { useEffect, useRef, useState, useCallback } from "react";
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import {
+  initializeScene,
+  addOrbitControls,
+  addBasicLighting,
+  createAnimationLoop,
+  applyWireframeToObject,
+  restoreOriginalMaterials,
+  normalizeObject,
+  disposeObject,
+  createGrid,
+  setupRaycaster,
+} from "@/lib/three-utils";
+import { cn } from "@/lib/utils";
+
+type ViewMode = "wireframe" | "solid" | "xray";
+
+interface ModelViewerProps {
+  modelUrl?: string;
+  className?: string;
+  initialViewMode?: ViewMode;
+  showControls?: boolean;
+  showGrid?: boolean;
+  backgroundColor?: number;
+  wireframeColor?: number;
+  onModelLoaded?: (model: THREE.Group) => void;
+  onError?: (error: Error) => void;
+  onProgress?: (progress: number) => void;
+}
+
+export default function ModelViewer({
+  modelUrl,
+  className,
+  initialViewMode = "wireframe",
+  showControls = true,
+  showGrid = true,
+  backgroundColor = 0x0a0a0a,
+  wireframeColor = 0x00ff00,
+  onModelLoaded,
+  onError,
+  onProgress,
+}: ModelViewerProps) {
+  const mountRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const modelRef = useRef<THREE.Group | null>(null);
+  const controlsRef = useRef<OrbitControls | null>(null);
+  const originalMaterialsRef = useRef<Map<THREE.Mesh, THREE.Material | THREE.Material[]>>(
+    new Map()
+  );
+  const cleanupRef = useRef<(() => void) | null>(null);
+  const animationRef = useRef<{ start: () => void; stop: () => void } | null>(null);
+
+  const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode);
+  const [loading, setLoading] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [selectedObject, setSelectedObject] = useState<THREE.Object3D | null>(null);
+
+  // Initialize scene
+  useEffect(() => {
+    if (!mountRef.current) return;
+
+    const { scene, camera, renderer, cleanup } = initializeScene({
+      container: mountRef.current,
+      cameraType: "perspective",
+      fov: 50,
+      alpha: false,
+      antialias: true,
+      clearColor: backgroundColor,
+      clearAlpha: 1,
+    });
+
+    sceneRef.current = scene;
+    cleanupRef.current = cleanup;
+
+    camera.position.set(3, 2, 3);
+    camera.lookAt(0, 0, 0);
+
+    // Add lighting
+    addBasicLighting(scene);
+
+    // Add controls
+    const controls = addOrbitControls(camera, renderer.domElement, {
+      enableDamping: true,
+      dampingFactor: 0.05,
+      autoRotate: false,
+      minDistance: 0.5,
+      maxDistance: 50,
+    });
+    controlsRef.current = controls;
+
+    // Add grid
+    if (showGrid) {
+      const grid = createGrid(10, 10, 0x333333, 0x1a1a1a);
+      scene.add(grid);
+    }
+
+    // Setup raycaster for selection
+    const { updateMouse, intersectObjects } = setupRaycaster(camera);
+
+    const handleClick = (event: MouseEvent) => {
+      if (!modelRef.current) return;
+      updateMouse(event, renderer.domElement);
+      const intersects = intersectObjects([modelRef.current], true);
+      
+      if (intersects.length > 0) {
+        const selected = intersects[0].object;
+        setSelectedObject(selected);
+      } else {
+        setSelectedObject(null);
+      }
+    };
+
+    renderer.domElement.addEventListener("click", handleClick);
+
+    // Animation loop
+    const animation = createAnimationLoop(renderer, scene, camera, () => {
+      controls.update();
+    });
+    animationRef.current = animation;
+    animation.start();
+
+    return () => {
+      animation.stop();
+      renderer.domElement.removeEventListener("click", handleClick);
+      controls.dispose();
+      if (modelRef.current) {
+        disposeObject(modelRef.current);
+      }
+      cleanup();
+    };
+  }, [backgroundColor, showGrid]);
+
+  // Handle auto-rotate
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.autoRotate = autoRotate;
+    }
+  }, [autoRotate]);
+
+  // Load model when URL changes
+  useEffect(() => {
+    if (!modelUrl || !sceneRef.current) return;
+
+    setLoading(true);
+    setError(null);
+    setLoadProgress(0);
+
+    // Remove existing model
+    if (modelRef.current) {
+      sceneRef.current.remove(modelRef.current);
+      disposeObject(modelRef.current);
+      modelRef.current = null;
+      originalMaterialsRef.current.clear();
+    }
+
+    const loader = new GLTFLoader();
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.6/");
+    loader.setDRACOLoader(dracoLoader);
+
+    loader.load(
+      modelUrl,
+      (gltf) => {
+        const model = gltf.scene;
+        modelRef.current = model;
+
+        // Normalize size and position
+        normalizeObject(model, 2);
+
+        // Store original materials
+        model.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            originalMaterialsRef.current.set(child, child.material);
+          }
+        });
+
+        // Apply initial view mode
+        if (viewMode === "wireframe") {
+          applyWireframeToObject(model, { color: wireframeColor, opacity: 0.8 });
+        } else if (viewMode === "xray") {
+          applyXrayMode(model);
+        }
+
+        sceneRef.current!.add(model);
+        setLoading(false);
+        onModelLoaded?.(model);
+      },
+      (progress) => {
+        const percent = progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0;
+        setLoadProgress(Math.round(percent));
+        onProgress?.(percent);
+      },
+      (err) => {
+        console.error("Error loading model:", err);
+        const error = err instanceof Error ? err : new Error("Failed to load model");
+        setError(error.message);
+        setLoading(false);
+        onError?.(error);
+      }
+    );
+  }, [modelUrl, wireframeColor, onModelLoaded, onProgress, onError]);
+
+  // Handle view mode changes
+  useEffect(() => {
+    if (!modelRef.current) return;
+
+    const model = modelRef.current;
+
+    switch (viewMode) {
+      case "wireframe":
+        applyWireframeToObject(model, { color: wireframeColor, opacity: 0.8 });
+        break;
+      case "xray":
+        applyXrayMode(model);
+        break;
+      case "solid":
+        restoreOriginalMaterials(model, originalMaterialsRef.current);
+        break;
+    }
+  }, [viewMode, wireframeColor]);
+
+  const applyXrayMode = (model: THREE.Object3D) => {
+    model.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.material = new THREE.MeshBasicMaterial({
+          color: wireframeColor,
+          transparent: true,
+          opacity: 0.3,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        });
+      }
+    });
+  };
+
+  const resetCamera = useCallback(() => {
+    if (controlsRef.current) {
+      controlsRef.current.reset();
+    }
+  }, []);
+
+  return (
+    <div className={cn("relative w-full h-full bg-black", className)}>
+      <div ref={mountRef} className="w-full h-full" />
+
+      {/* Loading overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-10">
+          <div className="w-16 h-16 border-2 border-green-500/30 border-t-green-500 rounded-full animate-spin mb-4" />
+          <div className="text-green-500 font-mono text-sm mb-2">Loading Model...</div>
+          <div className="w-48 h-1 bg-gray-800 rounded overflow-hidden">
+            <div
+              className="h-full bg-green-500 transition-all duration-300"
+              style={{ width: `${loadProgress}%` }}
+            />
+          </div>
+          <div className="text-gray-500 text-xs mt-2 font-mono">{loadProgress}%</div>
+        </div>
+      )}
+
+      {/* Error overlay */}
+      {error && (
+        <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10">
+          <div className="text-center">
+            <div className="text-red-500 text-lg mb-2">⚠️ Error</div>
+            <div className="text-gray-400 text-sm max-w-md">{error}</div>
+          </div>
+        </div>
+      )}
+
+      {/* No model placeholder */}
+      {!modelUrl && !loading && !error && (
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="text-center text-gray-500">
+            <div className="text-6xl mb-4">📦</div>
+            <div className="text-lg font-mono">No Model Loaded</div>
+            <div className="text-sm mt-2">Search for a model to get started</div>
+          </div>
+        </div>
+      )}
+
+      {/* Controls */}
+      {showControls && !loading && !error && modelUrl && (
+        <>
+          {/* View mode controls */}
+          <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
+            <div className="bg-black/70 backdrop-blur-sm border border-white/10 rounded-lg p-1 flex gap-1">
+              {(["wireframe", "solid", "xray"] as ViewMode[]).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setViewMode(mode)}
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-mono uppercase transition-colors rounded",
+                    viewMode === mode
+                      ? "bg-green-500 text-black"
+                      : "text-white/70 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {mode}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Camera controls */}
+          <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
+            <button
+              onClick={() => setAutoRotate(!autoRotate)}
+              className={cn(
+                "p-2 rounded-lg border transition-colors",
+                autoRotate
+                  ? "bg-green-500/20 border-green-500 text-green-500"
+                  : "bg-black/70 border-white/10 text-white/70 hover:text-white"
+              )}
+              title="Toggle Auto-Rotate"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+            <button
+              onClick={resetCamera}
+              className="p-2 rounded-lg bg-black/70 border border-white/10 text-white/70 hover:text-white transition-colors"
+              title="Reset Camera"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Info panel */}
+          <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm border border-white/10 rounded-lg p-3 z-20">
+            <div className="text-xs font-mono text-gray-400 space-y-1">
+              <div className="text-white/80 mb-2">Controls</div>
+              <div>Left Click + Drag: Rotate</div>
+              <div>Right Click + Drag: Pan</div>
+              <div>Scroll: Zoom</div>
+              <div>Click on object: Select</div>
+            </div>
+          </div>
+
+          {/* Selected object info */}
+          {selectedObject && (
+            <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm border border-green-500/30 rounded-lg p-3 z-20 max-w-xs">
+              <div className="text-xs font-mono">
+                <div className="text-green-500 mb-1">Selected Object</div>
+                <div className="text-white/80">{selectedObject.name || "Unnamed"}</div>
+                <div className="text-gray-500 mt-1">
+                  Type: {selectedObject.type}
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}

@@ -36,4 +36,5 @@ next-env.d.ts
 # OS/editor files
 .DS_Store
 .cursor/
+.nested-git-backups/
 *.pem
