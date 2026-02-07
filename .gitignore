@@ -37,4 +37,8 @@ next-env.d.ts
 .DS_Store
 .cursor/
 .nested-git-backups/
+old stuff/
+backboard_info.md
+bb_moreinfo.md
+links_to_buildings.txt
 *.pem
