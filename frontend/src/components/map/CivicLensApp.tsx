@@ -188,7 +188,7 @@ export default function CivicLensApp({
     const currentImpact = state.impacts[selectedBuilding.id];
     if (!currentImpact) return;
 
-    const result = suggestMitigation(input, currentImpact, layersRef.current);
+    const result = suggestMitigation(input, currentImpact, layersRef.current, footprint, selectedBuilding.rotation);
     if (result) {
       setMitigation(result);
       // Apply the mitigation
@@ -308,10 +308,7 @@ export default function CivicLensApp({
         <PlacementToolbar
           building={selectedBuilding}
           onUpdate={(updates) => updateBuilding(selectedBuilding.id, updates)}
-          onDelete={() => deleteBuilding(selectedBuilding.id)}
-          onDeselect={() => selectBuilding(null)}
           onMitigate={handleMitigate}
-          impactScore={selectedImpact?.overallAcceptance}
         />
       )}
 

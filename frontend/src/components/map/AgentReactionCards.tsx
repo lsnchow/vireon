@@ -321,32 +321,17 @@ export default function AgentReactionCards({
 
         {/* Aggregate summary */}
         <div className="px-4 py-3 border-b border-white/[0.04] flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-[10px] text-white/50 uppercase tracking-wider">
-                Sentiment Score
+          <div>
+            <span className="text-[10px] text-white/50 uppercase tracking-wider">
+              Sentiment Score
+            </span>
+            <div
+              className={`text-xl font-bold ${scoreColor(aggregate.sentiment_score)}`}
+            >
+              {Math.round(aggregate.sentiment_score)}
+              <span className="text-xs text-white/30 font-normal ml-1">
+                /100
               </span>
-              <div
-                className={`text-xl font-bold ${scoreColor(aggregate.sentiment_score)}`}
-              >
-                {Math.round(aggregate.sentiment_score)}
-                <span className="text-xs text-white/30 font-normal ml-1">
-                  /100
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className="text-[10px] text-white/50 uppercase tracking-wider">
-                Blended Score
-              </span>
-              <div
-                className={`text-xl font-bold ${scoreColor(aggregate.final_score)}`}
-              >
-                {Math.round(aggregate.final_score)}
-                <span className="text-xs text-white/30 font-normal ml-1">
-                  /100
-                </span>
-              </div>
             </div>
           </div>
           {aggregate.notes.length > 0 && (

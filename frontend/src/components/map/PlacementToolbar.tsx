@@ -1,17 +1,13 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import {
   RotateCw,
   ArrowUpDown,
-  Trash2,
-  X,
   Minus,
   Plus,
   Move,
   Shield,
-  ArrowLeft,
 } from 'lucide-react';
 import { getBuildingById, TYPE_BADGES } from '@/data/buildings';
 import type { PlacedBuilding } from '@/types/map';
@@ -19,19 +15,13 @@ import type { PlacedBuilding } from '@/types/map';
 interface PlacementToolbarProps {
   building: PlacedBuilding;
   onUpdate: (updates: Partial<Pick<PlacedBuilding, 'center' | 'rotation' | 'height'>>) => void;
-  onDelete: () => void;
-  onDeselect: () => void;
   onMitigate?: () => void;
-  impactScore?: number;
 }
 
 export default function PlacementToolbar({
   building,
   onUpdate,
-  onDelete,
-  onDeselect,
   onMitigate,
-  impactScore,
 }: PlacementToolbarProps) {
   const template = getBuildingById(building.templateId);
   if (!template) return null;
@@ -52,9 +42,6 @@ export default function PlacementToolbar({
                 {badge.label}
               </span>
             </div>
-            <p className="text-[10px] text-white/30">
-              Drag on map to reposition
-            </p>
           </div>
         </div>
 
@@ -128,7 +115,7 @@ export default function PlacementToolbar({
 
         {/* Mitigate button */}
         {onMitigate && (
-          <div className="flex items-center border-r border-white/[0.06] px-3">
+          <div className="flex items-center px-3">
             <button
               onClick={onMitigate}
               className="flex items-center gap-1.5 rounded-md bg-white/[0.06] px-3 py-2 text-[10px] uppercase tracking-wider text-white/60 transition-colors hover:bg-white/10 hover:text-white"
@@ -139,47 +126,6 @@ export default function PlacementToolbar({
             </button>
           </div>
         )}
-
-        {/* Actions */}
-        <div className="flex items-center gap-1 px-3">
-          {impactScore !== undefined && (
-            <div className="mr-1 flex flex-col items-center">
-              <span className="text-[9px] text-white/30">Score</span>
-              <span
-                className={`text-sm font-bold ${
-                  impactScore >= 60
-                    ? 'text-emerald-400'
-                    : impactScore >= 35
-                    ? 'text-amber-400'
-                    : 'text-red-400'
-                }`}
-              >
-                {impactScore}
-              </span>
-            </div>
-          )}
-          <Link
-            href="/renderer"
-            className="rounded-md p-2 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"
-            title="Back to Catalog"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-          <button
-            onClick={onDelete}
-            className="rounded-md p-2 text-red-400/70 transition-colors hover:bg-red-400/10"
-            title="Delete building"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-          <button
-            onClick={onDeselect}
-            className="rounded-md p-2 text-white/40 transition-colors hover:bg-white/[0.06] hover:text-white"
-            title="Deselect"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
       </div>
     </div>
   );

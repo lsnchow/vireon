@@ -121,6 +121,7 @@ export interface ImpactResult {
   overallAcceptance: number;
   topDrivers: ImpactDriver[];
   costEstimate: number;
+  grossVolume: number;        // m³ (footprint area × height)
 }
 
 export interface MitigationResult {

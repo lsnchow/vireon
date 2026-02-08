@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Users,
   DollarSign,
+  Box,
   ArrowDown,
   ArrowUp,
   Activity,
@@ -233,7 +234,7 @@ export default function ImpactScorecard({
 }: ImpactScorecardProps) {
   if (!impact) {
     return (
-      <div className="fixed right-4 top-20 z-40 w-96 rounded-xl border border-white/[0.06] bg-[rgba(6,13,24,0.9)] shadow-2xl backdrop-blur-xl font-mono">
+      <div className="fixed right-4 top-16 z-40 w-96 rounded-xl border border-white/[0.06] bg-[rgba(6,13,24,0.9)] shadow-2xl backdrop-blur-xl font-mono">
         <div className="px-5 py-8 text-center text-xs text-white/40 uppercase tracking-wider">
           Select or place a building to see impact scores
         </div>
@@ -246,7 +247,7 @@ export default function ImpactScorecard({
     : {};
 
   return (
-    <div className="fixed right-4 top-20 z-40 w-96 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-white/[0.06] bg-[rgba(6,13,24,0.9)] shadow-2xl backdrop-blur-xl font-mono">
+    <div className="fixed right-4 top-16 z-40 w-96 max-h-[calc(100vh-5rem)] overflow-y-auto rounded-xl border border-white/[0.06] bg-[rgba(6,13,24,0.9)] shadow-2xl backdrop-blur-xl font-mono">
       {/* Header */}
       <div className="border-b border-white/[0.04] px-5 py-4">
         <div className="flex items-center gap-2 mb-1">
@@ -269,20 +270,11 @@ export default function ImpactScorecard({
       {/* Blended score (shown after simulation) */}
       {aggregateResult && (
         <div className="px-5 py-4 border-b border-white/[0.04] bg-white/[0.015]">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="text-[10px] text-white/40 uppercase tracking-wider">Sentiment</span>
-              <div className={`text-base font-bold ${blendedScoreColor(aggregateResult.sentiment_score)}`}>
-                {Math.round(aggregateResult.sentiment_score)}
-                <span className="text-xs text-white/25 font-normal ml-1">/100</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className="text-[10px] text-white/40 uppercase tracking-wider">Final Blended</span>
-              <div className={`text-base font-bold ${blendedScoreColor(aggregateResult.final_score)}`}>
-                {Math.round(aggregateResult.final_score)}
-                <span className="text-xs text-white/25 font-normal ml-1">/100</span>
-              </div>
+          <div>
+            <span className="text-[10px] text-white/40 uppercase tracking-wider">Final Blended</span>
+            <div className={`text-base font-bold ${blendedScoreColor(aggregateResult.final_score)}`}>
+              {Math.round(aggregateResult.final_score)}
+              <span className="text-xs text-white/25 font-normal ml-1">/100</span>
             </div>
           </div>
           <p className="text-[10px] text-white/30 mt-1.5">
@@ -303,31 +295,25 @@ export default function ImpactScorecard({
       </div>
 
       {/* Cost estimate */}
-      <div className="border-t border-white/[0.04] px-5 py-3 flex items-center gap-2">
-        <DollarSign className="h-4 w-4 text-white/30" />
-        <span className="text-xs text-white/40">Est. Cost:</span>
-        <span className="text-sm font-medium text-white">
+      <div className="border-t border-white/[0.04] px-5 py-2.5 flex items-center gap-2">
+        <DollarSign className="h-3.5 w-3.5 text-white/30" />
+        <span className="text-[11px] text-white/40">Est. Cost:</span>
+        <span className="text-xs font-medium text-white">
           ${(impact.costEstimate / 1_000_000).toFixed(1)}M
         </span>
       </div>
 
-      {/* Top drivers for acceptance */}
-      {impact.topDrivers.length > 0 && (
-        <div className="border-t border-white/[0.04] px-5 py-3">
-          <div className="text-[10px] font-medium text-white/40 mb-1.5 uppercase tracking-wider">
-            Key Drivers
-          </div>
-          {impact.topDrivers.map((d, i) => (
-            <div key={i} className="flex items-baseline gap-1.5 text-xs mb-0.5">
-              <span className="text-white/20">{'>'}</span>
-              <span className="text-white/60">{d.name}</span>
-              <span className="font-mono text-white/35">
-                {d.value === Infinity ? '∞' : d.value} {d.unit}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Gross building volume */}
+      <div className="border-t border-white/[0.04] px-5 py-2.5 flex items-center gap-2">
+        <Box className="h-3.5 w-3.5 text-white/30" />
+        <span className="text-[11px] text-white/40">Gross Volume:</span>
+        <span className="text-xs font-medium text-white">
+          {impact.grossVolume >= 1_000
+            ? `${(impact.grossVolume / 1_000).toFixed(1)}k`
+            : impact.grossVolume}{' '}
+          m&sup3;
+        </span>
+      </div>
 
       {/* Mitigation suggestion */}
       {mitigation && (

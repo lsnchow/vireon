@@ -50,12 +50,6 @@ export default function HoverTooltip({
               </span>
             </div>
           )}
-          {impact && impact.topDrivers[0] && (
-            <div className="mt-0.5 text-[10px] text-white/30 truncate">
-              {impact.topDrivers[0].name}: {impact.topDrivers[0].value}{' '}
-              {impact.topDrivers[0].unit}
-            </div>
-          )}
         </>
       )}
       {featureName && (

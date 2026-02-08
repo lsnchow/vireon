@@ -141,7 +141,36 @@ export default function RendererPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
-              {/* Upload Proposal (mock) */}
+              {BUILDINGS.map((building) => {
+                const isSelected = selectedBuilding?.id === building.id;
+                const isLoading = loadingModel === building.id;
+
+                return (
+                  <button
+                    key={building.id}
+                    onClick={() => handleSelectBuilding(building)}
+                    disabled={isLoading}
+                    className={cn(
+                      "flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border text-left transition-all",
+                      isSelected
+                        ? "border-white/20 bg-white/[0.06]"
+                        : "border-white/[0.06] bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]",
+                      isLoading && "opacity-60 cursor-wait"
+                    )}
+                  >
+                    {isLoading && (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white/50 flex-shrink-0" />
+                    )}
+                    <span className="text-xs font-medium text-white truncate">
+                      {building.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Upload Proposal (mock) */}
+            <div className="p-3 border-t border-white/[0.06] flex-shrink-0">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -150,10 +179,8 @@ export default function RendererPage() {
                 onChange={(e) => {
                   if (e.target.files && e.target.files.length > 0) {
                     setUploadStatus('loaded');
-                    // Reset after 4 seconds
                     setTimeout(() => setUploadStatus('idle'), 4000);
                   }
-                  // Clear so the same file can be re-selected
                   e.target.value = '';
                 }}
               />
@@ -183,35 +210,6 @@ export default function RendererPage() {
                   </p>
                 </div>
               </button>
-
-              <div className="h-px bg-white/[0.04] my-1" />
-
-              {BUILDINGS.map((building) => {
-                const isSelected = selectedBuilding?.id === building.id;
-                const isLoading = loadingModel === building.id;
-
-                return (
-                  <button
-                    key={building.id}
-                    onClick={() => handleSelectBuilding(building)}
-                    disabled={isLoading}
-                    className={cn(
-                      "flex items-center gap-2 w-full px-3 py-2.5 rounded-lg border text-left transition-all",
-                      isSelected
-                        ? "border-white/20 bg-white/[0.06]"
-                        : "border-white/[0.06] bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]",
-                      isLoading && "opacity-60 cursor-wait"
-                    )}
-                  >
-                    {isLoading && (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white/50 flex-shrink-0" />
-                    )}
-                    <span className="text-xs font-medium text-white truncate">
-                      {building.name}
-                    </span>
-                  </button>
-                );
-              })}
             </div>
           </div>
         </aside>

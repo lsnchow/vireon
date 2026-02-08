@@ -14,9 +14,9 @@ import {
   minDistanceToFeatures,
   polygonAreaM2,
   polygonCentroid,
-  nearestFeatureCentroid,
   type FeatureCollection,
 } from './geo-analysis';
+import { getTransformedFootprint } from './geo';
 import type {
   CriterionResult,
   ImpactDriver,
@@ -33,16 +33,16 @@ const CENTERS: { name: string; lngLat: [number, number] }[] = [
 ];
 
 /* ── Tuning constants ── */
-const K_ENV_PARK = 40;      // sensitivity coefficient for park distance
-const K_ENV_WATER = 25;     // sensitivity coefficient for water distance
+const K_ENV_PARK = 25;      // sensitivity coefficient for park distance
+const K_ENV_WATER = 15;     // sensitivity coefficient for water distance
 const K_INFRA_ROAD = 300;   // road-distance denominator for infra strain
-const K_LIVE = 200;         // livability coefficient
+const K_LIVE = 120;         // livability coefficient
 const K_ECON = 0.003;       // economic benefit decay per metre
 const BASE_COST_M2 = 3500;  // $/m² fallback for cost estimate
 const EPS = 1;              // avoid division by zero (metres)
 
 /* ── Weight vector for C5 (Public Acceptance) ── */
-const W = { benefit: 0.40, env: 0.25, live: 0.20, infra: 0.15 };
+const W = { benefit: 0.30, env: 0.40, live: 0.15, infra: 0.15 };
 
 /* ── Interfaces ── */
 export interface CityLayers {
@@ -79,7 +79,7 @@ function computeC1(
   const parkTerm = dPark < Infinity ? K_ENV_PARK / (dPark + EPS) : 0;
   const waterTerm = dWater < Infinity ? K_ENV_WATER / (dWater + EPS) : 0;
   const raw = parkTerm + waterTerm;
-  const score = Math.min(100, Math.round(raw * 10));
+  const score = Math.min(100, Math.round(raw * 7));
 
   const drivers: ImpactDriver[] = [
     {
@@ -136,12 +136,6 @@ function computeC2(
   const score = Math.min(100, Math.round(raw * 70));
 
   const drivers: ImpactDriver[] = [
-    {
-      name: 'Building intensity (area × height)',
-      value: Math.round(intensity),
-      unit: 'm³',
-      description: `${Math.round(areaM2)} m² footprint × ${height} m height`,
-    },
     {
       name: 'Distance to major road',
       value: Math.round(dRoad),
@@ -246,12 +240,6 @@ function computeC4(
 
   const drivers: ImpactDriver[] = [
     {
-      name: 'Building intensity',
-      value: Math.round(intensity),
-      unit: 'm³',
-      description: 'Higher intensity contributes more economic activity',
-    },
-    {
       name: `Distance to ${centerDistances[0].name}`,
       value: Math.round(centerDistances[0].dist),
       unit: 'm',
@@ -293,7 +281,8 @@ function computeC5(
     W.benefit * c4.score - W.env * c1.score - W.infra * c2.score - W.live * c3.score;
 
   // Shift to 0-100 range (raw can be ~ -100 to +100)
-  const score = Math.max(0, Math.min(100, Math.round(50 + raw / 2)));
+  // Base of 50 + divisor of 1.5 amplifies differences for a wide spread
+  const score = Math.max(0, Math.min(100, Math.round(50 + raw / 1.5)));
 
   // Identify top 2 drivers (highest absolute contributions)
   const contributions = [
@@ -355,87 +344,89 @@ export function computeAllImpacts(
     overallAcceptance: c5.score,
     topDrivers,
     costEstimate: cost,
+    grossVolume: Math.round(areaM2 * building.height),
   };
 }
 
 /* ══════════════════════════════════════════════════════════
-   Mitigation suggestion
+   Mitigation suggestion — grid-search for best nearby location
    ══════════════════════════════════════════════════════════ */
+
+/** Radii (metres) and angular steps for the search grid */
+const SEARCH_RADII = [100, 300, 500, 800];
+const ANGLE_STEP_DEG = 30; // 12 directions per ring
+const DEG_PER_METRE = 1 / 111_320;
+
 export function suggestMitigation(
   building: BuildingInput,
   impacts: ImpactResult,
-  layers: CityLayers
+  layers: CityLayers,
+  footprintMeters: [number, number][],
+  rotation: number
 ): MitigationResult | null {
-  const centroid = polygonCentroid(building.polygon as number[][]);
-
-  // Find the worst criterion (highest score among "higher is worse" criteria)
-  const worstCriteria = impacts.criteria
-    .filter((c) => c.higherIsWorse)
-    .sort((a, b) => b.score - a.score);
-
-  if (worstCriteria.length === 0) return null;
-  const worst = worstCriteria[0];
-
-  let newCenter: [number, number] | undefined;
-  let newHeight: number | undefined;
-  let description = '';
-
-  const DEG_PER_METRE = 1 / 111_320;
-
-  if (worst.id === 'c1_env' && layers.parks) {
-    // Move away from nearest sensitive feature
-    const nearest = nearestFeatureCentroid(centroid, layers.parks);
-    if (nearest) {
-      const dx = centroid[0] - nearest.centroid[0];
-      const dy = centroid[1] - nearest.centroid[1];
-      const len = Math.sqrt(dx * dx + dy * dy);
-      if (len > 0) {
-        const shift = 100 * DEG_PER_METRE; // move 100m away
-        newCenter = [
-          centroid[0] + (dx / len) * shift,
-          centroid[1] + (dy / len) * shift,
-        ];
-        description = 'Move building ~100 m away from nearest park/green space';
-      }
-    }
-  } else if (worst.id === 'c3_live') {
-    // Reduce height by 20%
-    newHeight = Math.max(6, Math.round(building.height * 0.8));
-    description = `Reduce height from ${building.height} m to ${newHeight} m (−20%) to lower livability impact`;
-  } else if (worst.id === 'c2_infra' && layers.roads) {
-    // Move toward nearest road
-    const nearest = nearestFeatureCentroid(centroid, layers.roads);
-    if (nearest) {
-      const dx = nearest.centroid[0] - centroid[0];
-      const dy = nearest.centroid[1] - centroid[1];
-      const len = Math.sqrt(dx * dx + dy * dy);
-      if (len > 0) {
-        const shift = 80 * DEG_PER_METRE;
-        newCenter = [
-          centroid[0] + (dx / len) * shift,
-          centroid[1] + (dy / len) * shift,
-        ];
-        description = 'Move building ~80 m closer to major road corridor';
-      }
-    }
-  }
-
-  if (!description) {
-    // Fallback: reduce height
-    newHeight = Math.max(6, Math.round(building.height * 0.8));
-    description = `Reduce height from ${building.height} m to ${newHeight} m as general mitigation`;
-  }
-
-  // Compute before/after (approximation using same building with modified params)
+  const currentCenter = polygonCentroid(building.polygon as number[][]) as [number, number];
+  const currentScore = impacts.overallAcceptance;
   const beforeScores = impacts.criteria;
 
-  // For after, we re-compute with the mitigation applied
-  const mitigatedBuilding: BuildingInput = {
-    ...building,
-    height: newHeight ?? building.height,
-    // Note: for center change, the polygon itself would shift but we approximate
-    // by just adjusting the centroid used in computation
+  // Helper: build a BuildingInput at a candidate centre
+  const buildAt = (center: [number, number]): BuildingInput => {
+    const polygon = getTransformedFootprint(footprintMeters, center, rotation);
+    return {
+      ...building,
+      polygon,
+    };
   };
+
+  // Evaluate the current position as baseline best
+  let bestScore = currentScore;
+  let bestCenter: [number, number] = currentCenter;
+
+  // Grid-search: radii × angles
+  const cosLat = Math.cos((currentCenter[1] * Math.PI) / 180);
+
+  for (const radius of SEARCH_RADII) {
+    for (let angleDeg = 0; angleDeg < 360; angleDeg += ANGLE_STEP_DEG) {
+      const angleRad = (angleDeg * Math.PI) / 180;
+      const dLng = (radius * Math.cos(angleRad) * DEG_PER_METRE) / cosLat;
+      const dLat = radius * Math.sin(angleRad) * DEG_PER_METRE;
+
+      const candidate: [number, number] = [
+        currentCenter[0] + dLng,
+        currentCenter[1] + dLat,
+      ];
+
+      const candidateBuilding = buildAt(candidate);
+      const result = computeAllImpacts(candidateBuilding, layers);
+
+      if (result.overallAcceptance > bestScore) {
+        bestScore = result.overallAcceptance;
+        bestCenter = candidate;
+      }
+    }
+  }
+
+  // Did we find a better location?
+  const improved = bestScore > currentScore;
+  let newCenter: [number, number] | undefined;
+  let newHeight: number | undefined;
+  let description: string;
+
+  if (improved) {
+    newCenter = bestCenter;
+    const distMoved = Math.round(
+      haversineDistance(currentCenter, bestCenter)
+    );
+    description = `Move building ~${distMoved} m to a location with higher acceptance (score ${currentScore} → ${bestScore})`;
+  } else {
+    // Fallback: reduce height by 20% if no better location found
+    newHeight = Math.max(6, Math.round(building.height * 0.8));
+    description = `Reduce height from ${building.height} m to ${newHeight} m (−20%) — no better nearby location found`;
+  }
+
+  // Compute after-scores for the chosen mitigation
+  const mitigatedBuilding: BuildingInput = improved
+    ? buildAt(bestCenter)
+    : { ...building, height: newHeight! };
 
   const afterImpacts = computeAllImpacts(mitigatedBuilding, layers);
 
