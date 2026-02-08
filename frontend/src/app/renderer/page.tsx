@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,8 @@ import {
   ArrowUpDown,
   Minus,
   Plus,
+  Upload,
+  CheckCircle,
 } from "lucide-react";
 import { BUILDINGS } from "@/data/buildings";
 import type { BuildingTemplate } from "@/types/map";
@@ -38,6 +40,8 @@ export default function RendererPage() {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const [loadingModel, setLoadingModel] = useState<string | null>(null);
   const [heightOverride, setHeightOverride] = useState<number | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'loaded'>('idle');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   /* Load 3D model for selected building */
   const handleSelectBuilding = useCallback(
@@ -137,6 +141,51 @@ export default function RendererPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
+              {/* Upload Proposal (mock) */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".glb,.gltf,.obj,.fbx,.ifc,.zip"
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    setUploadStatus('loaded');
+                    // Reset after 4 seconds
+                    setTimeout(() => setUploadStatus('idle'), 4000);
+                  }
+                  // Clear so the same file can be re-selected
+                  e.target.value = '';
+                }}
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className={cn(
+                  "flex items-center gap-2 w-full px-3 py-3 rounded-lg border border-dashed text-left transition-all",
+                  uploadStatus === 'loaded'
+                    ? "border-emerald-500/30 bg-emerald-500/5"
+                    : "border-white/10 bg-white/[0.01] hover:border-white/20 hover:bg-white/[0.03]"
+                )}
+              >
+                {uploadStatus === 'loaded' ? (
+                  <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                ) : (
+                  <Upload className="w-4 h-4 text-white/30 flex-shrink-0" />
+                )}
+                <div>
+                  <span className={cn(
+                    "text-xs font-medium",
+                    uploadStatus === 'loaded' ? "text-emerald-400" : "text-white/50"
+                  )}>
+                    {uploadStatus === 'loaded' ? 'File Loaded' : 'Upload Proposal'}
+                  </span>
+                  <p className="text-[9px] text-white/20 mt-0.5">
+                    {uploadStatus === 'loaded' ? 'Ready for review' : '.glb, .gltf, .obj, .ifc'}
+                  </p>
+                </div>
+              </button>
+
+              <div className="h-px bg-white/[0.04] my-1" />
+
               {BUILDINGS.map((building) => {
                 const isSelected = selectedBuilding?.id === building.id;
                 const isLoading = loadingModel === building.id;

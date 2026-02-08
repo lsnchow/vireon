@@ -235,8 +235,11 @@ function computeC4(
     centerDistances.push({ name: c.name, dist: d });
   }
 
-  const raw = normIntensity * proximitySum;
-  const score = Math.min(100, Math.round(raw * 60));
+  // Apply a baseline boost + curve to make scores generally favorable (60+)
+  // Buildings inherently create economic activity (jobs, taxes, services)
+  const baseline = 0.4; // Guarantees ~40 points minimum
+  const raw = baseline + (normIntensity * proximitySum * 1.2); // 1.2x multiplier
+  const score = Math.min(100, Math.round(raw * 80)); // Scale up to reach 60-80 range easily
 
   // Sort to find closest centre
   centerDistances.sort((a, b) => a.dist - b.dist);

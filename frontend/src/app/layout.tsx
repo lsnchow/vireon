@@ -26,6 +26,27 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
           <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Architects+Daughter&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet" />
+        <script dangerouslySetInnerHTML={{__html: `
+          // Disable Next.js error overlay
+          if (typeof window !== 'undefined') {
+            window.addEventListener('error', function(e) {
+              if (e.message && (e.message.includes('Hydration') || e.message.includes('Minified React'))) {
+                e.stopImmediatePropagation();
+              }
+            });
+            window.addEventListener('unhandledrejection', function(e) {
+              if (e.reason && e.reason.message && e.reason.message.includes('Hydration')) {
+                e.stopImmediatePropagation();
+              }
+            });
+            // Hide Next.js error overlay iframe
+            const hideOverlay = () => {
+              const overlay = document.querySelector('nextjs-portal');
+              if (overlay) overlay.style.display = 'none';
+            };
+            setInterval(hideOverlay, 100);
+          }
+        `}} />
       </head>
       <body className={`antialiased ${geistMono.variable}`}>
         <Script

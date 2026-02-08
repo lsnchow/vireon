@@ -60,7 +60,7 @@ function geojsonToMeterOffsets(coordinates: number[][][]): {
 export const BUILDINGS: BuildingTemplate[] = [
   {
     id: 'bldg_eleven_condo',
-    name: 'Vertex Condominiums',
+    name: '11-Story Condominium',
     type: 'residential',
     defaultHeight: 33,
     floors: 11,
@@ -78,7 +78,7 @@ export const BUILDINGS: BuildingTemplate[] = [
   },
   {
     id: 'bldg_warehouse',
-    name: 'Halcyon Warehouse',
+    name: 'Industrial Warehouse',
     type: 'industrial',
     defaultHeight: 12,
     floors: 4,
@@ -96,7 +96,7 @@ export const BUILDINGS: BuildingTemplate[] = [
   },
   {
     id: 'bldg_industrial_block',
-    name: 'Foundry Block',
+    name: 'Industrial Block',
     type: 'industrial',
     defaultHeight: 6,
     floors: 2,
@@ -114,7 +114,7 @@ export const BUILDINGS: BuildingTemplate[] = [
   },
   {
     id: 'bldg_lowrise_industrial',
-    name: 'Slate Works',
+    name: '2-Story Industrial',
     type: 'residential',
     defaultHeight: 3,
     floors: 2,
@@ -134,7 +134,7 @@ export const BUILDINGS: BuildingTemplate[] = [
   },
   {
     id: 'bldg_midrise_tower',
-    name: 'Arden Tower',
+    name: 'Mid-Rise Tower',
     type: 'mixed_use',
     defaultHeight: 12,
     floors: 4,
@@ -152,7 +152,7 @@ export const BUILDINGS: BuildingTemplate[] = [
   },
   {
     id: 'bldg_midrise_res',
-    name: 'Clover Residences',
+    name: 'Mid-Rise Residential',
     type: 'residential',
     defaultHeight: 9,
     floors: 3,
