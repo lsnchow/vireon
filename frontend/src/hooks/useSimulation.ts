@@ -67,10 +67,10 @@ function buildImpactPayload(impact: ImpactResult): SimulateImpactPayload {
       deterministic_acceptance: impact.overallAcceptance,
     },
     drivers: {
-      d_to_park_m: Math.min(driverMap['Distance to nearest park/green'] ?? driverMap['Dist to park'] ?? 500, 2000),
-      d_to_water_m: Math.min(driverMap['Distance to nearest waterway'] ?? driverMap['Dist to water'] ?? 500, 2000),
+      d_to_park_m: Math.min(driverMap['Distance to nearest park/green'] ?? driverMap['Dist to park'] ?? 500, 1000),
+      d_to_water_m: Math.min(driverMap['Distance to nearest waterway'] ?? driverMap['Dist to water'] ?? 500, 1000),
       overlap_sensitive_m2: driverMap['Overlap with sensitive area'] ?? driverMap['Overlap sensitive'] ?? 0,
-      d_to_major_road_m: Math.min(driverMap['Distance to major road'] ?? driverMap['Dist to road'] ?? 200, 2000),
+      d_to_major_road_m: Math.min(driverMap['Distance to major road'] ?? driverMap['Dist to road'] ?? 50, 50),
       d_to_residential_m: Math.min(driverMap['Distance to residential zone'] ?? driverMap['Dist to residential'] ?? 300, 2000),
       intensity: driverMap['Building intensity (area × height)'] ?? driverMap['Intensity'] ?? 0,
       center_proximity_score: driverMap['Centre proximity score'] ?? driverMap['Proximity'] ?? 0,
