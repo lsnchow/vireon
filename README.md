@@ -1,4 +1,6 @@
-# Vireon
+# Vireon 🪷
+
+Video Demo Link: https://www.youtube.com/watch?v=QulGipS0YnY
 
 Vireon is a full-stack urban development simulator:
 - `frontend/` is a Next.js app for 3D building preview, map placement, deterministic impact scoring, and simulation UI.
